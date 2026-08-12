@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>OT Life: Clinical Simulator</title>
+<style>
+:root{
+ --bg:#f6f4fb;--paper:#fff;--ink:#24212d;--muted:#6f6879;--line:#e5dfed;
+ --accent:#7657e8;--accent2:#a777ff;--good:#238562;--bad:#c74660;--warn:#a56d00;
+ --soft:#f0ebff;--blue:#eaf4ff;--shadow:0 14px 38px rgba(56,42,87,.10)
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(145deg,#f5f2fb,#fff7fa 48%,#eef8ff);color:var(--ink);min-height:100vh}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.shell{max-width:1020px;margin:auto;padding:16px 16px 40px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:4px 0 14px}
+.logo{font-weight:950;font-size:1.32rem;letter-spacing:-.03em}
+.logo span{color:var(--accent)}
+.stats{display:flex;gap:7px;flex-wrap:wrap}
+.pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:.86rem;font-weight:800;box-shadow:0 4px 12px rgba(40,30,60,.05)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:23px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
+.hero{padding:30px}
+h1,h2,h3,p{margin-top:0} h1{font-size:clamp(2rem,6vw,3.65rem);line-height:.98;letter-spacing:-.055em;margin-bottom:13px}
+h2{font-size:1.45rem;letter-spacing:-.025em} h3{font-size:1.03rem}
+.muted{color:var(--muted);line-height:1.55}.small{font-size:.89rem}.tiny{font-size:.79rem}
+.kicker{display:inline-block;background:var(--soft);color:#5f42bd;font-size:.78rem;font-weight:900;padding:6px 9px;border-radius:999px;margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em}
+.btn{width:100%;border:none;border-radius:15px;padding:13px 15px;margin:6px 0;background:#f0ecfa;color:var(--ink);font-weight:800;text-align:left;transition:.12s}
+.btn:hover{transform:translateY(-1px);filter:brightness(.99)} .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;text-align:center}
+.btn.secondary{background:#fff;border:1px solid var(--line);text-align:center}.btn.danger{background:#ffe7ec;color:#8b263d}
+.btn.selected{outline:3px solid #9b84f1;background:#eee8ff}.btn:disabled{cursor:default;transform:none;opacity:.84}
+.row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.metric{background:#faf8fd;border:1px solid #ece6f3;border-radius:17px;padding:14px}.metric b{font-size:1.2rem}
+.progress{height:10px;background:#ece8f2;border-radius:999px;overflow:hidden;margin:8px 0 16px}.bar{height:100%;background:linear-gradient(90deg,var(--accent),#e883af)}
+.client{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center;padding:14px;border-radius:18px;background:#faf8fd;margin-bottom:15px}
+.avatar{width:72px;height:72px;border-radius:21px;background:linear-gradient(135deg,#ded3ff,#ffd9e8);display:grid;place-items:center;font-size:2.15rem}
+.chart{background:#fbfafc;border:1px solid var(--line);border-radius:18px;padding:16px}.chart dl{display:grid;grid-template-columns:140px 1fr;gap:8px 14px;margin:0}.chart dt{font-weight:900;color:#5f5868}.chart dd{margin:0}
+.notice{padding:13px 14px;border-radius:14px;margin:12px 0;line-height:1.45}.good{background:#e2f6ed;color:#176248}.bad{background:#ffe5eb;color:#81233a}.warn{background:#fff2d7;color:#72500c}.info{background:#edf4ff;color:#315c91}
+.check{display:flex;gap:10px;align-items:flex-start;padding:11px;border:1px solid var(--line);border-radius:14px;margin:7px 0;background:#fff}.check input{margin-top:3px;transform:scale(1.18)}
+textarea,input[type=text]{width:100%;border:1px solid #d9d2e3;border-radius:13px;padding:12px;background:#fff;color:var(--ink)} textarea{min-height:105px;resize:vertical}
+.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:14px}.tab{white-space:nowrap;border:none;background:#eee9f7;border-radius:999px;padding:8px 11px;font-weight:800}.tab.active{background:var(--accent);color:#fff}
+.casegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}.casecard{border:1px solid var(--line);border-radius:19px;padding:16px;background:#fff}
+.locked{opacity:.55;filter:grayscale(.4)}.casecard .emoji{font-size:1.75rem}
+.scorebig{font-size:3.5rem;font-weight:950;letter-spacing:-.06em}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+kbd{background:#f3f0f7;border:1px solid #ddd5e6;border-bottom-width:2px;padding:2px 5px;border-radius:6px}
+footer{text-align:center;color:var(--muted);font-size:.78rem;padding-top:10px}
+@media(max-width:700px){.row,.row3,.casegrid{grid-template-columns:1fr}.chart dl{grid-template-columns:1fr;gap:2px}.chart dd{margin-bottom:8px}.client{grid-template-columns:58px 1fr}.avatar{width:58px;height:58px}.hero{padding:22px}.card{padding:18px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="logo">🧠 <span>OT Life</span> — Clinical Simulator</div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <main id="app"></main>
+  <footer>Educational simulation only. Not a substitute for faculty instruction, facility policy, state law, or clinical judgment.</footer>
+</div>
+
+<script>
+const CASES=[
+{
+ id:"stroke",unlock:0,emoji:"🧓",name:"Maria R.",age:68,setting:"Inpatient Rehabilitation",dx:"Right CVA; left hemiparesis",precautions:"Fall risk; monitor BP and activity tolerance",reason:"Decline in dressing, transfers, and meal preparation after stroke.",prior:"Independent with ADLs/IADLs; lived alone; enjoyed cooking for family.",goal:"Return home and dress independently.",
+ profile:["Dressing","Home management","Meal preparation","Community mobility","Family role"],
+ assessments:[
+  ["Occupational profile interview",3,"Directly establishes meaningful occupations, priorities, routines, contexts, and goals."],
+  ["ADL performance observation",3,"Shows actual occupational performance and assistance/cueing needs."],
+  ["ROM / strength screening",2,"Useful client-factor information supporting performance analysis."],
+  ["Visual-perceptual / neglect screening",3,"Highly relevant after CVA when performance suggests possible neglect."],
+  ["Random personality inventory",0,"Not well matched to the referral question."],
+  ["Maximal treadmill test",0,"Not the priority for this presentation and setting."]
+ ],
+ evalEvent:{q:"During the evaluation Maria repeatedly leaves food untouched on the left side of her tray. What should you do?",a:[
+   ["Explore possible left neglect with functional observation/screening and incorporate findings into treatment planning.",3,"This behavior may indicate unilateral neglect affecting occupational performance."],
+   ["Assume she dislikes the food and move on.",0,"You may miss an important performance barrier."],
+   ["Diagnose a new neurologic condition yourself.",0,"OT can screen and document functional findings, but should not independently make an unrelated medical diagnosis."]
+ ]},
+ goalChoices:[
+  ["Within 2 weeks, Maria will complete upper-body dressing with setup assist using compensatory strategies in 4/5 opportunities.",3],
+  ["Maria will get better at dressing soon.",0],
+  ["Maria will increase shoulder flexion to 180° so she can be independent.",1]
+ ],
+ interventions:[
+  ["Task-specific dressing practice using affected-side strategies",3],
+  ["Environmental scanning during meal-prep simulation",3],
+  ["Meaningful kitchen task graded for safety and endurance",3],
+  ["Only passive ROM for the entire session",1],
+  ["Have family complete all self-care for her",0]
+ ],
+ ethics:{q:"Maria's neighbor calls and asks how therapy is going because she plans to help after discharge.",a:[
+   ["Share only her diagnosis, since that is not therapy information.",0,"A diagnosis is still protected health information."],
+   ["Explain that you cannot disclose health information without appropriate permission.",3,"This protects confidentiality and privacy."],
+   ["Give a full update because the neighbor is helping after discharge.",0,"Helping the client does not automatically authorize disclosure."]
+ ]},
+ emergency:{q:"During transfer training Maria becomes pale, dizzy, and says she may faint.",a:[
+   ["Finish the transfer quickly so you can document a completed trial.",0,"Completion is never more important than immediate safety."],
+   ["Stop, secure her safely, assess/respond per facility policy, and obtain appropriate medical assistance.",3,"Correct: respond to the change in status and prioritize safety."],
+   ["Tell her to push through it to improve endurance.",0,"This is unsafe."]
+ ]},
+ soap:{S:["dizzy","dress","home","independent"],O:["assist","cue","transfer","dressing","minutes"],A:["progress","limited","safety","neglect","performance"],P:["continue","dressing","scan","family","discharge"]},
+ discharge:{q:"At discharge Maria is safe with dressing but still needs supervision for complex cooking. Best plan?",a:[
+   ["Document current function, educate Maria/caregiver as appropriate, recommend needed supports, and coordinate follow-up services.",3],
+   ["Discharge without discussing kitchen safety because dressing improved.",0],
+   ["Tell her she may never cook again.",0]
+ ]}
+},
+{
+ id:"peds",unlock:0,emoji:"🧒",name:"Eli T.",age:7,setting:"Pediatric Outpatient",dx:"Autism; sensory processing differences",precautions:"No medical precautions listed; monitor regulation and assent/engagement",reason:"Difficulty with toothbrushing, dressing routine, and transitions before school.",prior:"Needs frequent parent assistance in morning routine; loves swings and dinosaurs.",goal:"Participate more independently in morning self-care.",
+ profile:["ADLs","Play","Education","Family routines","Sensory preferences"],
+ assessments:[
+  ["Parent/caregiver interview",3,"Provides information about routines, priorities, contexts, and carryover."],
+  ["Observation of a simulated morning routine",3,"Occupation-based observation reveals where performance breaks down."],
+  ["Age-appropriate sensory processing measure",3,"Can help characterize sensory patterns when relevant to function."],
+  ["Fine-motor screening",2,"May be useful if manipulation skills affect dressing or toothbrushing."],
+  ["Adult work-capacity evaluation",0,"Not appropriate for this child/referral."],
+  ["Unrelated lower-extremity endurance test",0,"Not matched to the occupational concerns."]
+ ],
+ evalEvent:{q:"Eli avoids the table and runs to the swing at the start of the session.",a:[
+   ["Use his interest in movement to support regulation/rapport, then grade the transition toward a relevant self-care activity.",3,"Client interests can be used therapeutically while still progressing toward goals."],
+   ["Physically force him into the chair.",0,"This risks safety and rapport and ignores regulation needs."],
+   ["End therapy every time he chooses the swing.",1,"Following the child's cues matters, but therapy can often be adapted rather than automatically ended."]
+ ]},
+ goalChoices:[
+  ["Within 4 weeks, Eli will complete 4/5 steps of toothbrushing with visual supports and no more than 2 verbal cues.",3],
+  ["Eli will behave better in the morning.",0],
+  ["Eli will tolerate all textures without difficulty.",0]
+ ],
+ interventions:[
+  ["Visual schedule for morning routine",3],
+  ["Graded toothbrushing practice embedded in play",3],
+  ["Caregiver coaching for consistent routines and supports",3],
+  ["Remove all preferred activities until he complies",0],
+  ["Practice only handwriting despite no school-writing concern",0]
+ ],
+ ethics:{q:"Eli's parent asks you to guarantee independent toothbrushing within two weeks.",a:[
+   ["Guarantee it to build hope.",0,"Do not promise outcomes that cannot be assured."],
+   ["Explain that progress varies, review measurable goals, and discuss home carryover.",3,"Truthful, collaborative communication supports informed decision-making."],
+   ["Tell them therapy cannot help.",0,"That conclusion is not supported by the scenario."]
+ ]},
+ emergency:{q:"Eli begins coughing forcefully after putting a small toy piece in his mouth.",a:[
+   ["Continue the sensory activity because interrupting may upset him.",0,"Possible airway compromise requires immediate attention."],
+   ["Immediately respond to the safety risk according to training/facility emergency procedures and summon appropriate help.",3,"Safety takes priority."],
+   ["Ask the parent to wait until the session ends.",0,"Do not delay response to a possible emergency."]
+ ]},
+ soap:{S:["mom","parent","toothbrush","morning","doesn't"],O:["steps","cue","visual","swing","minutes"],A:["regulation","progress","assist","routine","performance"],P:["continue","visual","caregiver","toothbrush","home"]},
+ discharge:{q:"Eli meets his morning-routine goals and the family demonstrates carryover. What now?",a:[
+   ["Discuss outcomes with the family and transition/discharge based on goals, needs, and plan of care.",3],
+   ["Keep therapy forever because he likes coming.",0],
+   ["Add unrelated goals only to avoid discharge.",0]
+ ]}
+},
+{
+ id:"hand",unlock:60,emoji:"✂️",name:"Jordan K.",age:34,setting:"Outpatient Hand Therapy",dx:"Distal radius fracture, 8 weeks post-op",precautions:"Follow surgeon protocol; graded loading",reason:"Pain/stiffness limiting hairstyling and household tasks.",prior:"Full-time hairstylist; independent; primary income earner.",goal:"Return to cutting and styling hair.",
+ profile:["Work","IADLs","Tool use","Endurance","Pain management"],
+ assessments:[
+  ["Occupational profile focused on hairstyling demands",3,"Links impairments directly to meaningful work performance."],
+  ["Wrist/forearm ROM",3,"Relevant objective measure."],
+  ["Grip/pinch strength when permitted",3,"Relevant to tool handling and work demands."],
+  ["Functional task simulation with salon tools",3,"Strong occupation-based performance information."],
+  ["Pediatric sensory profile",0,"Not appropriate here."],
+  ["Cognitive screen despite no indication",1,"Could be used if concerns emerge, but it is not the priority from this referral."]
+ ],
+ evalEvent:{q:"Jordan says pain is 6/10 only after holding a blow dryer for several minutes.",a:[
+   ["Analyze duration, grip, posture, tool weight, symptoms, and task demands.",3,"OT performance analysis should connect symptoms to the actual occupation."],
+   ["Ignore it because ROM is more objective.",0,"Client-reported and functional information matters."],
+   ["Tell Jordan to quit hairstyling.",0,"This ignores the client's goal and possible adaptation."]
+ ]},
+ goalChoices:[
+  ["Within 3 weeks, Jordan will simulate 20 minutes of hairstyling using adaptive pacing with pain ≤3/10.",3],
+  ["Jordan will have a normal wrist.",0],
+  ["Jordan will increase wrist ROM by 5°.",1]
+ ],
+ interventions:[
+  ["Graded salon-task simulation",3],
+  ["Ergonomic/tool modification",3],
+  ["Pacing and symptom-management education",3],
+  ["Force maximal resistance despite precautions",0],
+  ["Only discuss anatomy without practicing function",1]
+ ],
+ ethics:{q:"Jordan asks whether they should double their prescribed pain medication before therapy.",a:[
+   ["Recommend doubling it.",0,"Medication dosing decisions are outside OT scope."],
+   ["Refer medication questions to the prescribing provider while discussing functional symptom-management strategies within OT scope.",3,"Stay within scope while supporting function."],
+   ["Tell them to stop all medication.",0,"Also outside scope and potentially unsafe."]
+ ]},
+ emergency:{q:"Jordan reports new severe swelling, color change, and intense pain unlike prior sessions.",a:[
+   ["Ignore it and continue strengthening.",0,"A significant new change in status warrants action."],
+   ["Stop treatment, assess within OT scope, and escalate/communicate according to clinic and medical procedures.",3,"Appropriate response to a potentially significant change."],
+   ["Massage aggressively until the color changes back.",0,"Potentially unsafe."]
+ ]},
+ soap:{S:["work","pain","hair","job","dryer"],O:["rom","grip","minutes","pain","task"],A:["tolerance","progress","limited","performance","work"],P:["continue","graded","ergonomic","pacing","work"]},
+ discharge:{q:"Jordan returns to a full schedule with independent symptom management. Best discharge action?",a:[
+   ["Document outcomes, home/self-management plan, and discharge recommendations.",3],
+   ["Stop scheduling visits without telling Jordan.",0],
+   ["Keep adding visits despite goals being met.",0]
+ ]}
+},
+{
+ id:"home",unlock:120,emoji:"🏠",name:"Denise P.",age:79,setting:"Home Health",dx:"Recent hip fracture; fall risk",precautions:"Hip precautions per medical orders; fall prevention",reason:"Difficulty completing bathing, cooking, and home mobility safely.",prior:"Lived alone and managed all IADLs.",goal:"Remain in her home and cook independently.",
+ profile:["Home management","Bathing","Meal preparation","Mobility","Safety"],
+ assessments:[
+  ["Home safety assessment",3,"Directly evaluates environmental supports and barriers."],
+  ["Observation of kitchen task",3,"Shows performance within the real context."],
+  ["Functional transfer assessment",3,"Relevant to bathing/toileting/home mobility."],
+  ["Client interview about routines and priorities",3,"Essential client-centered information."],
+  ["Competitive sports performance test",0,"Not relevant."],
+  ["Unrelated academic achievement test",0,"Not relevant."]
+ ],
+ evalEvent:{q:"You notice loose rugs, dim lighting, and heavy pans stored overhead.",a:[
+   ["Collaborate on modifications while preserving Denise's preferred routines.",3,"Environmental modification can support safe participation rather than simply removing occupations."],
+   ["Tell Denise she can no longer cook.",0,"Overly restrictive and not client-centered."],
+   ["Ignore hazards because they are part of her home.",0,"Environmental context is central to home-health OT."]
+ ]},
+ goalChoices:[
+  ["Within 3 visits, Denise will prepare a simple meal using recommended environmental modifications with no loss of balance.",3],
+  ["Denise will be safe at home.",0],
+  ["Denise will gain 10 pounds of strength.",0]
+ ],
+ interventions:[
+  ["Reorganize frequently used kitchen items into accessible zones",3],
+  ["Practice safe meal preparation in context",3],
+  ["Train adaptive equipment for bathing as indicated",3],
+  ["Remove every item Denise enjoys from the home",0],
+  ["Perform exercises only and never address home tasks",1]
+ ],
+ ethics:{q:"Denise offers you $100 cash because she says you are the only person who listens to her.",a:[
+   ["Accept it secretly.",0,"This creates a professional-boundary concern."],
+   ["Warmly decline and maintain appropriate professional boundaries, following agency policy.",3,"Correct."],
+   ["Take it because refusing is disrespectful.",0,"Client feelings matter, but professional boundaries still apply."]
+ ]},
+ emergency:{q:"Denise slips during a bathroom transfer and you prevent the fall, but she reports sudden hip pain.",a:[
+   ["Continue bathing training.",0,"A new acute symptom after a near-fall requires appropriate response."],
+   ["Stop, secure her safely, assess/respond within role, and follow agency procedures for medical escalation and incident documentation.",3,"Safety and accurate reporting are priorities."],
+   ["Do not report it because she did not hit the floor.",0,"A safety incident/change in status may still require reporting."]
+ ]},
+ soap:{S:["home","cook","pain","alone","bath"],O:["transfer","assist","meal","cue","equipment"],A:["safety","fall","progress","performance","environment"],P:["continue","home","equipment","kitchen","caregiver"]},
+ discharge:{q:"Denise can safely complete essential home routines with modifications. Best next step?",a:[
+   ["Review recommendations, document outcomes, coordinate supports, and discharge/transition according to the plan of care.",3],
+   ["Remove all modifications before discharge.",0],
+   ["Tell family they must move her out regardless of her preferences.",0]
+ ]}
+},
+{
+ id:"mental",unlock:180,emoji:"🌱",name:"Avery N.",age:26,setting:"Community Mental Health",dx:"Major depressive disorder; reduced routine participation",precautions:"Monitor reported safety concerns and follow organizational escalation procedures",reason:"Difficulty maintaining self-care, sleep routine, meal preparation, and return-to-work habits.",prior:"Previously worked part-time and enjoyed art and walking.",goal:"Build a manageable daily routine and resume valued roles.",
+ profile:["Health management","Rest/sleep","Work","Leisure","Social participation"],
+ assessments:[
+  ["Occupational profile and routine mapping",3,"Identifies meaningful roles, habits, supports, barriers, and priorities."],
+  ["Interest checklist or values-based activity exploration",3,"Can support re-engagement in meaningful occupations."],
+  ["Performance observation of a chosen daily task",3,"Provides functional information."],
+  ["Appropriate standardized measure related to occupational participation",2,"Can add structured outcome data if chosen appropriately."],
+  ["Maximal grip-strength protocol as primary assessment",0,"Not matched to the referral."],
+  ["Make assumptions from diagnosis without interviewing Avery",0,"Diagnosis alone does not define occupational needs."]
+ ],
+ evalEvent:{q:"Avery says, “Everyone keeps telling me what I should do. I want to choose something I actually care about.”",a:[
+   ["Collaboratively identify personally meaningful routines and start with achievable occupation-based steps.",3,"Supports autonomy and client-centered care."],
+   ["Choose the routine for Avery because clinicians know best.",0,"This minimizes autonomy."],
+   ["Tell Avery motivation must improve before OT can help.",0,"OT can grade and adapt participation."]
+ ]},
+ goalChoices:[
+  ["Within 4 weeks, Avery will follow a self-selected morning routine on 4/7 days using a visual plan and pacing strategies.",3],
+  ["Avery will stop being depressed.",0],
+  ["Avery will wake up earlier.",1]
+ ],
+ interventions:[
+  ["Activity scheduling around valued occupations",3],
+  ["Graded meal-prep routine",3],
+  ["Sleep-routine/environment strategies within OT scope",3],
+  ["Shame Avery for missed routines",0],
+  ["Set goals without Avery's input",0]
+ ],
+ ethics:{q:"A coworker who is not involved in Avery's care asks why Avery attends the program.",a:[
+   ["Tell them because they work at the same organization.",0,"Access should be based on legitimate role/need, not curiosity."],
+   ["Do not disclose private information without an authorized reason.",3,"Protect confidentiality."],
+   ["Show them Avery's chart but ask them not to tell anyone.",0,"Still inappropriate."]
+ ]},
+ emergency:{q:"Avery makes a statement that raises an immediate safety concern.",a:[
+   ["Keep it secret because Avery asked you to.",0,"Potential immediate safety concerns require action consistent with law, policy, and professional responsibilities."],
+   ["Take the statement seriously, remain within your role, and follow the organization's safety/risk escalation procedures promptly.",3,"Appropriate. Safety procedures and qualified support should be activated."],
+   ["Change the subject so Avery does not feel uncomfortable.",0,"Do not ignore a significant safety concern."]
+ ]},
+ soap:{S:["routine","sleep","work","tired","goal"],O:["days","routine","meal","plan","cue"],A:["participation","progress","barrier","routine","performance"],P:["continue","schedule","sleep","meal","work"]},
+ discharge:{q:"Avery independently uses strategies and has resumed valued routines. What should discharge emphasize?",a:[
+   ["Outcomes, self-management strategies, supports/resources, and a collaborative transition plan.",3],
+   ["Dependence on the therapist for all future decisions.",0],
+   ["A new set of unrelated goals.",0]
+ ]}
+},
+{
+ id:"school",unlock:240,emoji:"🎒",name:"Noah B.",age:10,setting:"School-Based OT",dx:"Fine-motor and written-work participation concerns",precautions:"School policies and educational plan apply",reason:"Teacher reports slow written work, fatigue, and difficulty organizing classroom materials.",prior:"Enjoys science and group projects; participates in general education.",goal:"Complete classroom work more efficiently and independently.",
+ profile:["Education","School routines","Written work","Organization","Participation"],
+ assessments:[
+  ["Interview/consultation with student and relevant school team members",3,"School OT considers educational participation and context."],
+  ["Classroom observation",3,"Shows real environmental and task demands."],
+  ["Functional handwriting/written-work sample",3,"Directly relevant to occupational performance."],
+  ["Fine-motor assessment if indicated",2,"May help explain performance factors."],
+  ["Hospital fall-risk scale",0,"Not appropriate."],
+  ["Adult driving evaluation",0,"Not relevant."]
+ ],
+ evalEvent:{q:"Noah writes neatly but takes twice as long as peers and misses instruction while copying.",a:[
+   ["Analyze task demands and consider accommodations/strategies that improve access and participation, not just neatness.",3,"Educational participation is broader than handwriting appearance."],
+   ["Conclude there is no OT concern because writing is neat.",0,"Speed, fatigue, and participation also matter."],
+   ["Require extra copying practice during recess.",0,"This may reduce participation without addressing the actual barrier."]
+ ]},
+ goalChoices:[
+  ["Within 6 weeks, Noah will complete a grade-level written classroom task within the allotted time using agreed supports in 4/5 trials.",3],
+  ["Noah will have perfect handwriting.",0],
+  ["Noah will improve fine motor skills.",1]
+ ],
+ interventions:[
+  ["Classroom strategy for copying/material organization",3],
+  ["Trial appropriate writing/access supports",3],
+  ["Teacher/student collaboration and environmental adaptation",3],
+  ["Only isolated hand exercises with no classroom connection",1],
+  ["Punish Noah for slow work",0]
+ ],
+ ethics:{q:"Another parent asks why Noah receives OT at school.",a:[
+   ["Explain Noah's diagnosis because parents should know what services classmates receive.",0,"Do not disclose another student's private information."],
+   ["Do not share Noah's confidential educational/health information.",3,"Correct."],
+   ["Give hints without saying his name.",0,"Indirect disclosure can still violate privacy."]
+ ]},
+ emergency:{q:"During a classroom activity Noah suddenly develops a significant medical symptom and appears acutely unwell.",a:[
+   ["Follow the school's emergency/health procedures immediately and get appropriate personnel.",3,"Safety procedures take priority."],
+   ["Wait for OT time to end.",0,"Do not delay emergency response."],
+   ["Send him to walk alone to the office.",0,"Potentially unsafe depending on condition."]
+ ]},
+ soap:{S:["school","write","tired","class","science"],O:["minutes","written","cue","task","materials"],A:["participation","speed","fatigue","performance","barrier"],P:["continue","classroom","support","teacher","writing"]},
+ discharge:{q:"Noah now participates efficiently using classroom supports. Best transition?",a:[
+   ["Document educational participation outcomes and collaborate with the school team regarding continued supports/OT need.",3],
+   ["Remove every successful support immediately.",0],
+   ["Continue direct OT automatically even if no skilled need remains.",0]
+ ]}
+}
+];
+
+const ETHICS_NAMES=["Beneficence","Nonmaleficence","Autonomy","Justice","Veracity","Fidelity"];
+let state=JSON.parse(localStorage.getItem("otlife_state")||"null")||{
+ xp:0,money:0,level:1,clin:100,ethics:100,safety:100,rapport:100,completed:[],name:"Student OT"
+};
+let run=null;
+
+function save(){localStorage.setItem("otlife_state",JSON.stringify(state))}
+function calcLevel(){state.level=1+Math.floor(state.xp/100)}
+function stats(){
+ calcLevel();
+ document.getElementById("stats").innerHTML=
+ `<div class="pill">⭐ Lv ${state.level}</div><div class="pill">XP ${state.xp}</div><div class="pill">💵 $${state.money}</div>`;
+ save();
+}
+function app(s){document.getElementById("app").innerHTML=s;stats();window.scrollTo({top:0,behavior:"smooth"})}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function home(){
+ app(`<section class="card hero">
+ <div class="kicker">OT student career game</div>
+ <h1>Run your own<br>OT clinic shift.</h1>
+ <p class="muted">Review charts, evaluate occupational performance, choose assessments, write measurable goals, select interventions, respond to ethical and safety situations, document SOAP notes, and make discharge decisions.</p>
+ <div class="row">
+   <button class="btn primary" onclick="clinic()">Enter Clinic</button>
+   <button class="btn secondary" onclick="howto()">How to Play</button>
+ </div>
+ <div class="row3" style="margin-top:14px">
+   <div class="metric"><b>${state.completed.length}</b><br><span class="small muted">cases completed</span></div>
+   <div class="metric"><b>${state.xp}</b><br><span class="small muted">career XP</span></div>
+   <div class="metric"><b>${state.level}</b><br><span class="small muted">clinician level</span></div>
+ </div>
+ </section>
+ <section class="card">
+  <h2>Career progression</h2>
+  <p class="muted small">New settings unlock as you earn XP. Replaying a case still earns practice XP, but the first completion gives the largest reward.</p>
+  <div class="progress"><div class="bar" style="width:${Math.min(100,(state.xp%100))}%"></div></div>
+  <div class="small">Next clinician level at <b>${Math.ceil((state.xp+1)/100)*100} XP</b>.</div>
+ </section>`);
+}
+function howto(){
+ app(`<section class="card">
+ <div class="kicker">Orientation</div><h2>Your job</h2>
+ <p class="muted">You play the occupational therapist. Each case moves through a simplified OT process. Strong choices earn Clinical Reasoning Points (CRP). Unsafe, non-client-centered, out-of-scope, or unethical choices reduce your shift score.</p>
+ <div class="chart"><dl>
+ <dt>1. Chart review</dt><dd>Read diagnosis, precautions, referral, prior level, and client goal.</dd>
+ <dt>2. Occupational profile</dt><dd>Identify occupations and contexts that matter to the client.</dd>
+ <dt>3. Evaluation</dt><dd>Select relevant assessments and interpret functional observations.</dd>
+ <dt>4. Goal writing</dt><dd>Choose a measurable, occupation-focused goal.</dd>
+ <dt>5. Intervention</dt><dd>Select interventions that connect to goals and occupational performance.</dd>
+ <dt>6. Ethics & safety</dt><dd>Handle confidentiality, scope, boundaries, emergencies, and client rights.</dd>
+ <dt>7. Documentation</dt><dd>Write a short SOAP note. The game looks for clinically useful elements, not exact wording.</dd>
+ <dt>8. Outcomes</dt><dd>Choose a safe, client-centered discharge/transition plan.</dd>
+ </dl></div>
+ <div class="notice info small"><b>Classroom note:</b> This game intentionally simplifies real practice. Facility policy, state law, payer rules, supervision requirements, physician orders, and actual assessment manuals can change what is appropriate in a real case.</div>
+ <button class="btn primary" onclick="clinic()">Go to Clinic</button>
+ <button class="btn secondary" onclick="home()">Main Menu</button>
+ </section>`);
+}
+function clinic(){
+ const cards=CASES.map(c=>{
+  const locked=state.xp<c.unlock;
+  const done=state.completed.includes(c.id);
+  return `<div class="casecard ${locked?'locked':''}">
+   <div class="emoji">${c.emoji}</div><h3>${c.name}</h3>
+   <div class="small muted">${c.setting}</div><p class="small">${c.dx}</p>
+   ${locked?`<div class="notice warn tiny">🔒 Unlocks at ${c.unlock} XP</div>`:`<div class="tiny">${done?'✅ Completed':'🆕 New case'}</div>
+   <button class="btn primary" onclick="startCase('${c.id}')">${done?'Replay Case':'Open Chart'}</button>`}
+  </div>`
+ }).join("");
+ app(`<section class="card">
+ <div class="kicker">Clinic dashboard</div><h2>Today's Caseload</h2>
+ <p class="muted">Pick a client. Higher-XP settings unlock as your clinical career progresses.</p>
+ <div class="casegrid">${cards}</div>
+ <hr><button class="btn secondary" onclick="resetCareer()">Reset Career</button>
+ <button class="btn secondary" onclick="home()">Main Menu</button>
+ </section>`);
+}
+function resetCareer(){
+ if(confirm("Reset all OT Life XP, money, and completed cases?")){
+  state={xp:0,money:0,level:1,clin:100,ethics:100,safety:100,rapport:100,completed:[],name:"Student OT"};save();home();
+ }
+}
+function startCase(id){
+ const c=CASES.find(x=>x.id===id);
+ run={id,c,stage:0,points:0,max:0,ethics:100,safety:100,rapport:100,selectedAssess:[],selectedInterv:[],notes:{},feedback:[]};
+ chart();
+}
+function stageHeader(title,n){
+ return `<div class="kicker">Case ${run.c.name} • Step ${n}/8</div>
+ <div class="progress"><div class="bar" style="width:${(n-1)/8*100}%"></div></div><h2>${title}</h2>`;
+}
+function chart(){
+ const c=run.c;
+ app(`<section class="card">${stageHeader("Chart Review",1)}
+ <div class="client"><div class="avatar">${c.emoji}</div><div><h2 style="margin:0">${c.name}, ${c.age}</h2><div class="muted">${c.setting}</div></div></div>
+ <div class="chart"><dl>
+ <dt>Diagnosis</dt><dd>${c.dx}</dd>
+ <dt>Precautions</dt><dd>${c.precautions}</dd>
+ <dt>Reason for OT</dt><dd>${c.reason}</dd>
+ <dt>Prior function</dt><dd>${c.prior}</dd>
+ <dt>Client-stated goal</dt><dd>“${c.goal}”</dd>
+ </dl></div>
+ <div class="notice info small"><b>Clinical reasoning:</b> Before doing anything, connect the referral and precautions to what the client wants and needs to do.</div>
+ <button class="btn primary" onclick="profile()">Begin Occupational Profile</button>
+ </section>`);
+}
+function profile(){
+ const c=run.c;
+ app(`<section class="card">${stageHeader("Occupational Profile",2)}
+ <p class="muted">Which areas belong in this client's occupational profile? Select all that are meaningful to this case.</p>
+ ${[...c.profile,"Unrelated celebrity trivia","Your personal opinion of the diagnosis"].map((x,i)=>`<label class="check"><input type="checkbox" data-prof="${i}"><span>${x}</span></label>`).join("")}
+ <button class="btn primary" onclick="scoreProfile()">Save Profile Priorities</button></section>`);
+}
+function scoreProfile(){
+ let sel=[...document.querySelectorAll("[data-prof]:checked")].map(x=>+x.dataset.prof);
+ let score=0,max=3;
+ sel.forEach(i=>{if(i<run.c.profile.length)score+=.6;else score-=1});
+ score=Math.max(0,Math.min(3,score));run.points+=score;run.max+=max;
+ evalAssess(score>=2.4);
+}
+function evalAssess(good){
+ const c=run.c;
+ app(`<section class="card">${stageHeader("Evaluation & Assessment",3)}
+ ${good?`<div class="notice good">✅ Strong profile: you centered meaningful occupations and roles.</div>`:`<div class="notice warn">Your profile could have been more focused on occupations relevant to the client.</div>`}
+ <p class="muted">Choose up to <b>4</b> evaluation methods. Strong choices should answer the referral question and help analyze occupational performance.</p>
+ ${c.assessments.map((a,i)=>`<label class="check"><input type="checkbox" data-ass="${i}" onchange="limitChecks('ass',4)"><span><b>${a[0]}</b></span></label>`).join("")}
+ <button class="btn primary" onclick="scoreAssess()">Complete Assessment Plan</button></section>`);
+}
+function limitChecks(type,max){
+ const xs=[...document.querySelectorAll(`[data-${type}]:checked`)];
+ if(xs.length>max){xs[xs.length-1].checked=false;alert(`Choose up to ${max}.`)}
+}
+function scoreAssess(){
+ const chosen=[...document.querySelectorAll("[data-ass]:checked")].map(x=>+x.dataset.ass);
+ if(!chosen.length){alert("Choose at least one assessment.");return}
+ let pts=chosen.reduce((s,i)=>s+run.c.assessments[i][1],0);
+ const max=12;run.points+=Math.min(max,pts);run.max+=max;
+ const explanations=chosen.map(i=>`<li><b>${run.c.assessments[i][0]}:</b> ${run.c.assessments[i][2]}</li>`).join("");
+ const ev=run.c.evalEvent;
+ app(`<section class="card">${stageHeader("Interpret Findings",3)}
+ <div class="notice info"><b>Your assessment plan</b><ul>${explanations}</ul></div>
+ <h3>${ev.q}</h3>
+ ${ev.a.map((a,i)=>`<button class="btn" onclick="singleChoice('eval',${i})">${a[0]}</button>`).join("")}
+ </section>`);
+}
+function singleChoice(kind,i){
+ let item, next;
+ if(kind==="eval"){item=run.c.evalEvent.a[i];next=goals}
+ if(kind==="goal"){item=run.c.goalChoices[i];next=intervention}
+ if(kind==="ethics"){item=run.c.ethics.a[i];next=safety}
+ if(kind==="safety"){item=run.c.emergency.a[i];next=soap}
+ if(kind==="discharge"){item=run.c.discharge.a[i];next=finish}
+ let pts=item[1];run.points+=pts;run.max+=3;
+ if(kind==="ethics"&&pts<3)run.ethics-=20;
+ if(kind==="safety"&&pts<3)run.safety-=25;
+ if((kind==="eval"||kind==="goal")&&pts<3)run.rapport-=8;
+ const msg=item[2]|| (pts===3?"Strong clinical choice.":pts===1?"Partly reasonable, but not the strongest occupation-focused option.":"This choice does not fit the case well.");
+ app(`<section class="card">
+ ${stageHeader(kind==="goal"?"Goal Review":kind==="ethics"?"Ethics Review":kind==="safety"?"Safety Review":kind==="discharge"?"Outcome Review":"Clinical Reasoning Review", kind==="goal"?4:kind==="ethics"?6:kind==="safety"?6:kind==="discharge"?8:3)}
+ <div class="notice ${pts===3?'good':pts===0?'bad':'warn'}"><b>${pts===3?'✅ Strong decision':pts===0?'⚠️ Clinical concern':'🟡 Partly appropriate'}</b><br>${msg}</div>
+ <button class="btn primary" onclick="${next.name}()">Continue</button></section>`);
+}
+function goals(){
+ const c=run.c;
+ app(`<section class="card">${stageHeader("Plan of Care: Goals",4)}
+ <p class="muted">Choose the strongest OT goal. Look for a meaningful occupation, measurable performance, conditions/supports, and a time frame.</p>
+ ${c.goalChoices.map((g,i)=>`<button class="btn" onclick="singleChoice('goal',${i})">${g[0]}</button>`).join("")}
+ </section>`);
+}
+function intervention(){
+ const c=run.c;
+ app(`<section class="card">${stageHeader("Intervention Session",5)}
+ <p class="muted">Build today's treatment session. Choose up to <b>3</b> interventions.</p>
+ ${c.interventions.map((x,i)=>`<label class="check"><input type="checkbox" data-int="${i}" onchange="limitChecks('int',3)"><span>${x[0]}</span></label>`).join("")}
+ <button class="btn primary" onclick="scoreInterv()">Treat Client</button></section>`);
+}
+function scoreInterv(){
+ const chosen=[...document.querySelectorAll("[data-int]:checked")].map(x=>+x.dataset.int);
+ if(!chosen.length){alert("Choose at least one intervention.");return}
+ let pts=chosen.reduce((s,i)=>s+run.c.interventions[i][1],0);run.points+=Math.min(9,pts);run.max+=9;
+ if(pts<5)run.rapport-=8;
+ ethics();
+}
+function ethics(){
+ const c=run.c;
+ app(`<section class="card">${stageHeader("Professional Ethics",6)}
+ <div class="notice info small"><b>Think like an OT:</b> protect client welfare, avoid harm, respect autonomy, act fairly, communicate truthfully, and maintain professional responsibilities.</div>
+ <h3>${c.ethics.q}</h3>
+ ${c.ethics.a.map((a,i)=>`<button class="btn" onclick="singleChoice('ethics',${i})">${a[0]}</button>`).join("")}
+ </section>`);
+}
+function safety(){
+ const c=run.c;
+ app(`<section class="card">${stageHeader("Unexpected Safety Event",6)}
+ <h3>${c.emergency.q}</h3>
+ ${c.emergency.a.map((a,i)=>`<button class="btn" onclick="singleChoice('safety',${i})">${a[0]}</button>`).join("")}
+ </section>`);
+}
+function soap(){
+ const c=run.c;
+ app(`<section class="card">${stageHeader("SOAP Documentation",7)}
+ <p class="muted">Write a short note from the case. This is a learning exercise: the game checks for useful elements, not exact wording.</p>
+ <h3>S — Subjective</h3><textarea id="S" placeholder="What did the client/caregiver report?"></textarea>
+ <h3>O — Objective</h3><textarea id="O" placeholder="What skilled intervention/performance was observed? Include measurable details when possible."></textarea>
+ <h3>A — Assessment</h3><textarea id="A" placeholder="Your clinical interpretation of performance, progress, barriers, and skilled need."></textarea>
+ <h3>P — Plan</h3><textarea id="P" placeholder="What is the next OT plan?"></textarea>
+ <button class="btn primary" onclick="scoreSoap()">Submit SOAP Note</button></section>`);
+}
+function keywordScore(text,words){
+ const t=text.toLowerCase();return Math.min(3,words.reduce((s,w)=>s+(t.includes(w)?1:0),0));
+}
+function scoreSoap(){
+ let total=0, details=[];
+ for(const sec of ["S","O","A","P"]){
+  const text=document.getElementById(sec).value.trim();
+  if(text.length<8){alert(`Add a little more detail to section ${sec}.`);return}
+  const pts=keywordScore(text,run.c.soap[sec]);
+  total+=pts;details.push(`${sec}: ${pts}/3`);
+ }
+ run.points+=total;run.max+=12;
+ app(`<section class="card">${stageHeader("Documentation Feedback",7)}
+ <div class="notice ${total>=9?'good':total>=6?'warn':'bad'}"><b>SOAP structure score: ${total}/12</b><br>${details.join(" • ")}</div>
+ <p class="muted small">A real note is judged on accuracy, skilled-service description, client response, measurable performance, clinical reasoning, plan-of-care requirements, and facility/payer rules—not just keywords.</p>
+ <button class="btn primary" onclick="discharge()">Go to Outcome Planning</button></section>`);
+}
+function discharge(){
+ const c=run.c;
+ app(`<section class="card">${stageHeader("Outcomes & Discharge",8)}
+ <h3>${c.discharge.q}</h3>
+ ${c.discharge.a.map((a,i)=>`<button class="btn" onclick="singleChoice('discharge',${i})">${a[0]}</button>`).join("")}
+ </section>`);
+}
+function finish(){
+ const pct=Math.round((run.points/run.max)*100);
+ const first=!state.completed.includes(run.id);
+ const xp=Math.max(15,Math.round(pct*.6)+(first?25:0));
+ const money=Math.max(10,Math.round(pct*.35));
+ state.xp+=xp;state.money+=money;if(first)state.completed.push(run.id);save();calcLevel();
+ let rank=pct>=92?"Clinical Star":pct>=82?"Strong OT Thinker":pct>=70?"Developing Clinician":"Needs More Supervision";
+ app(`<section class="card">
+ <div class="kicker">Case complete</div><div class="scorebig">${pct}%</div><h1 style="font-size:2.2rem">${rank}</h1>
+ <p class="muted">You completed ${run.c.name}'s case in ${run.c.setting}.</p>
+ <div class="row3">
+  <div class="metric"><b>${run.ethics}</b><br><span class="small muted">Ethics</span></div>
+  <div class="metric"><b>${run.safety}</b><br><span class="small muted">Safety</span></div>
+  <div class="metric"><b>${run.rapport}</b><br><span class="small muted">Client rapport</span></div>
+ </div>
+ <div class="notice good"><b>Rewards:</b> +${xp} XP &nbsp; • &nbsp; +$${money} clinic funds ${first?'• First-completion bonus':''}</div>
+ <button class="btn primary" onclick="clinic()">Return to Caseload</button>
+ <button class="btn secondary" onclick="startCase('${run.id}')">Replay This Case</button>
+ <button class="btn secondary" onclick="copyResult(${pct},'${rank.replace(/'/g,"")}')">Copy Result for Class</button>
+ </section>`);
+}
+function copyResult(pct,rank){
+ const t=`OT Life Clinical Simulator — ${run.c.name} (${run.c.setting})\nScore: ${pct}% — ${rank}\nEthics: ${run.ethics} | Safety: ${run.safety} | Rapport: ${run.rapport}`;
+ navigator.clipboard?.writeText(t).then(()=>alert("Result copied!")).catch(()=>prompt("Copy your result:",t));
+}
+home();
+</script>
+</body>
+</html>
