@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>OT Clinic Simulator V7</title>
+<title>OT Clinic Simulator V8</title>
 <style>
 :root{--ink:#241f2d;--purple:#7357e8;--purple2:#9c76f2;--line:#ddd6e8}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -13,7 +13,7 @@ button,select,textarea{font:inherit}
 #brand{font-weight:950;font-size:1.02rem}
 #stats{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
 .pill{font-size:.69rem;font-weight:850;background:#f4f0fb;border:1px solid #e2dceb;border-radius:999px;padding:6px 8px}
-#wrap{position:relative;height:calc(100vh - 60px);overflow:hidden;background:#bfcdd2}
+#wrap{position:relative;height:calc(100vh - 60px);overflow:hidden;background:#bcc9ce}
 canvas{width:100%;height:100%;display:block;touch-action:none}
 #objective,#schedule{position:absolute;top:10px;background:#fff;border:1px solid #ddd;border-radius:13px;padding:8px 10px;font-size:12px;z-index:7;box-shadow:0 4px 14px #0001}
 #objective{left:10px;max-width:215px}#schedule{right:10px;max-width:150px}
@@ -29,7 +29,7 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
 h1,h2,h3,p{margin-top:0}.muted{color:#6f6879;line-height:1.5}.small{font-size:.88rem}
 .btn{width:100%;padding:12px 13px;margin:6px 0;border:0;border-radius:13px;background:#f0ecf8;font-weight:800;text-align:left}
 .primary{background:linear-gradient(90deg,var(--purple),var(--purple2));color:white;text-align:center}
-.note{padding:11px 12px;border-radius:13px;margin:9px 0}.info{background:#edf4ff}.good{background:#e2f6ec}.bad{background:#ffe4ea}
+.note{padding:11px 12px;border-radius:13px;margin:9px 0}.info{background:#edf4ff}
 .creator{display:grid;grid-template-columns:300px 1fr;gap:16px}
 .preview{height:390px;border-radius:19px;background:linear-gradient(#cfe6ef 0 45%,#c6bfb4 45%);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
 .group{background:#f8f5fc;border:1px solid var(--line);border-radius:17px;padding:13px;margin-bottom:9px}
@@ -41,7 +41,7 @@ textarea{width:100%;min-height:75px;border:1px solid #ccc;border-radius:11px;pad
 </style>
 </head>
 <body>
-<div id="top"><div id="brand">🧠 OT Clinic Simulator V7</div><div id="stats"></div></div>
+<div id="top"><div id="brand">🧠 OT Clinic Simulator V8</div><div id="stats"></div></div>
 <div id="wrap">
 <canvas id="game"></canvas>
 <div id="objective"></div><div id="schedule"></div><div id="toast"></div><div id="hint"></div>
@@ -61,10 +61,10 @@ const scrubColors=['#765fe0','#4d9eaf','#db789b','#5d9c76','#698ccc','#b576c7','
 const hairStyles=['bun','long','braids','curly','short','ponytail'];
 let avatar={skin:skinTones[1],hair:hairColors[0],scrub:scrubColors[0],pants:'#263649',style:'bun'};
 
-let career={xp:+localStorage.v7xp||0,money:+localStorage.v7money||0,day:+localStorage.v7day||1};
-let G={started:false,stage:0,appt:0,eth:100,safe:100,clin:0,min:480,near:null,done:false};
+let career={xp:+localStorage.v8xp||0,money:+localStorage.v8money||0,day:+localStorage.v8day||1};
+let G={started:false,stage:0,appt:0,eth:100,safe:100,clin:0,min:480,near:null,done:false,room:'hall'};
 let keys={up:0,down:0,left:0,right:0};
-const player={x:0,z:0,speedZ:5.0,speedX:4.8,moving:false};
+const player={x:0,z:0,speedZ:5.2,speedX:5.0,moving:false};
 
 const clients=[
  {name:'Maria',setting:'Neuro Gym',goal:'Dress independently',chart:'Right CVA with left hemiparesis. Fall risk. Possible left neglect.',
@@ -84,31 +84,29 @@ const clients=[
  safe:['New severe swelling and color change appear.',['Stop and escalate per clinic/medical procedures.',3],['Continue strengthening.',0]]}
 ];
 
-// Corridor locations. x is true lateral position, not discrete lanes.
 const stations=[
  {id:'reception',z:420,x:0,label:'Reception'},
- {id:'chart',z:780,x:-180,label:'Chart Computer'},
- {id:'client',z:1080,x:170,label:'Waiting Client'},
- {id:'neuro',z:1550,x:-260,label:'Neuro Gym',case:0},
- {id:'peds',z:1550,x:0,label:'Pediatric Gym',case:1},
- {id:'hand',z:1550,x:260,label:'Hand Therapy',case:2},
- {id:'soap',z:2050,x:0,label:'Documentation'},
+ {id:'chart',z:760,x:-210,label:'Chart Computer'},
+ {id:'client',z:1080,x:190,label:'Waiting Client'},
+ {id:'neuroDoor',z:1500,x:-320,label:'Neuro Gym Door',case:0,room:'neuro'},
+ {id:'pedsDoor',z:1500,x:0,label:'Pediatric Gym Door',case:1,room:'peds'},
+ {id:'handDoor',z:1500,x:320,label:'Hand Therapy Door',case:2,room:'hand'},
+ {id:'soapDoor',z:2000,x:320,label:'Documentation Door',room:'soap'},
  {id:'exit',z:2500,x:0,label:'Exit'}
 ];
 
 function resize(){const r=cv.parentElement.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
 addEventListener('resize',resize);resize();
-
-function save(){localStorage.v7xp=career.xp;localStorage.v7money=career.money;localStorage.v7day=career.day}
+function save(){localStorage.v8xp=career.xp;localStorage.v8money=career.money;localStorage.v8day=career.day}
 function stat(){statsEl.innerHTML=`<span class="pill">Day ${career.day}</span><span class="pill">XP ${career.xp}</span><span class="pill">$${career.money}</span><span class="pill">Ethics ${G.eth}</span><span class="pill">Safety ${G.safe}</span>`}
 function time(){let h=Math.floor(G.min/60),m=G.min%60,ap=h>=12?'PM':'AM';return `${h%12||12}:${String(m).padStart(2,'0')} ${ap}`}
-function ui(){let c=clients[G.appt],t=G.done?'Walk to the clinic exit.':G.stage===0?'Go to Reception and clock in.':G.stage===1?`Review ${c.name}'s chart.`:G.stage===2?`Talk to ${c.name} in the waiting area.`:G.stage===3?`Take ${c.name} to ${c.setting}.`:G.stage===4?`Document ${c.name}'s session.`:'Return to Reception.';objEl.innerHTML='<b>Objective</b><br>'+t;schedEl.innerHTML=`<b>${time()}</b><br>${clients.map((c,i)=>(i<G.appt?'✅ ':i===G.appt&&!G.done?'➡️ ':'• ')+c.name).join('<br>')}`;stat()}
+function ui(){let c=clients[G.appt],t=G.done?'Walk to the clinic exit.':G.stage===0?'Go to Reception and clock in.':G.stage===1?`Review ${c.name}'s chart.`:G.stage===2?`Talk to ${c.name} in the waiting area.`:G.stage===3?`Enter ${c.setting}.`:G.stage===4?`Go to Documentation.`:'Return to Reception.';objEl.innerHTML='<b>Objective</b><br>'+t;schedEl.innerHTML=`<b>${time()}</b><br>${clients.map((c,i)=>(i<G.appt?'✅ ':i===G.appt&&!G.done?'➡️ ':'• ')+c.name).join('<br>')}`;stat()}
 function toast(t){toastEl.textContent=t;toastEl.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>toastEl.style.display='none',2200)}
 function overlay(html){let d=document.createElement('div');d.className='overlay';d.id='overlay';d.innerHTML='<div class="panel">'+html+'</div>';document.body.appendChild(d)}
 function closeOverlay(){document.getElementById('overlay')?.remove()}
 
 function creator(){
- overlay(`<h1>Create Your OT</h1><p class="muted">Customize your character, then enter the new over-the-shoulder clinic view.</p>
+ overlay(`<h1>Create Your OT</h1><p class="muted">Customize your character, then enter the rebuilt clinic.</p>
  <div class="creator"><div class="preview"><canvas id="previewCanvas" width="300" height="390"></canvas></div>
  <div>
  <div class="group"><b>Skin tone</b><div class="swatches">${skinTones.map(c=>`<button class="swatch ${avatar.skin===c?'selected':''}" data-k="skin" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
@@ -116,18 +114,17 @@ function creator(){
  <div class="group"><b>Scrub color</b><div class="swatches">${scrubColors.map(c=>`<button class="swatch ${avatar.scrub===c?'selected':''}" data-k="scrub" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
  <div class="group"><label><b>Hair style</b><select id="styleSelect">${hairStyles.map(s=>`<option ${avatar.style===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
  </div></div>
- <div class="note info"><b>V7 movement:</b> you can now move continuously left/right across the hallway, not just snap between lanes.</div>
+ <div class="note info"><b>V8:</b> the hallway is now the main world. Rooms sit off the sides with their own interiors, so the clinic no longer stacks all furniture in front of you.</div>
  <button class="btn primary" id="startBtn">Enter Clinic</button>`);
  document.querySelectorAll('.swatch').forEach(b=>b.onclick=()=>{avatar[b.dataset.k]=b.dataset.v;closeOverlay();creator()});
  document.getElementById('styleSelect').onchange=e=>{avatar.style=e.target.value;drawPreview()};
  document.getElementById('startBtn').onclick=()=>{closeOverlay();G.started=true;ui();toast('Move forward to Reception.')};
- setTimeout(drawPreview,20);
+ setTimeout(drawPreview,20)
 }
 function drawPreview(){let p=document.getElementById('previewCanvas');if(!p)return;let c=p.getContext('2d');c.clearRect(0,0,p.width,p.height);drawPerson(c,150,260,avatar,2.4,true,false)}
 
 function drawPerson(c,x,y,a,s=1,front=false,moving=false){
- c.save();c.translate(x,y);
- let step=moving?Math.sin(Date.now()/95)*7:0;
+ c.save();c.translate(x,y);let step=moving?Math.sin(Date.now()/95)*7:0;
  c.fillStyle='#0002';c.beginPath();c.ellipse(0,50*s,28*s,8*s,0,0,Math.PI*2);c.fill();
  c.fillStyle=a.pants||'#36414c';c.fillRect(-17*s,18*s+step,13*s,38*s);c.fillRect(4*s,18*s-step,13*s,38*s);
  c.fillStyle='#262b30';c.fillRect(-20*s,52*s+step,18*s,7*s);c.fillRect(2*s,52*s-step,18*s,7*s);
@@ -142,118 +139,121 @@ function drawPerson(c,x,y,a,s=1,front=false,moving=false){
  if(a.style==='ponytail'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill();c.beginPath();c.ellipse(25*s,-52*s,8*s,18*s,-.25,0,Math.PI*2);c.fill()}
  if(a.style==='braids'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill();c.fillRect(-22*s,-62*s,6*s,44*s);c.fillRect(16*s,-62*s,6*s,44*s)}
  if(front){c.fillStyle='#32262b';c.beginPath();c.arc(-7*s,-59*s,2*s,0,7);c.arc(7*s,-59*s,2*s,0,7);c.fill();c.strokeStyle='#945f58';c.lineWidth=1.4*s;c.beginPath();c.arc(0,-48*s,6*s,.2,Math.PI-.2);c.stroke()}
- c.fillStyle='#fff';c.fillRect(9*s,-9*s,10*s,14*s);c.restore();
+ c.fillStyle='#fff';c.fillRect(9*s,-9*s,10*s,14*s);c.restore()
 }
 
-// Subway-Surfers-style perspective: wide foreground, narrow distance.
 function project(z,x){
- const r=cv.getBoundingClientRect();
- const dz=z-player.z;
- if(dz<-120)return null;
- const horizon=r.height*.18, bottom=r.height*.86;
- const t=Math.max(0,Math.min(1,dz/1500));
- const y=bottom-(bottom-horizon)*Math.pow(t,.72);
- const widthAtY=r.width*(.92-(.72*t));
- const px=r.width/2 + (x-player.x)*(widthAtY/720);
- const s=Math.max(.18,1.55*(1-t)+.15);
- return {x:px,y,s,dz,t,widthAtY}
+ const r=cv.getBoundingClientRect(),dz=z-player.z;if(dz<-120)return null;
+ const horizon=r.height*.19,bottom=r.height*.86,t=Math.max(0,Math.min(1,dz/1500));
+ const y=bottom-(bottom-horizon)*Math.pow(t,.72),corridorWidth=r.width*(.94-.70*t);
+ const px=r.width/2+(x-player.x)*(corridorWidth/760),s=Math.max(.17,1.5*(1-t)+.16);
+ return{x:px,y,s,dz,t,corridorWidth}
 }
-function drawEnvironment(){
- const r=cv.getBoundingClientRect(),cx=r.width/2,h=r.height*.18,b=r.height;
- // sky/ceiling
- ctx.fillStyle='#edf5f6';ctx.fillRect(0,0,r.width,h+40);
- // side walls with corridor opening
- ctx.fillStyle='#d8d3ca';ctx.beginPath();ctx.moveTo(0,h);ctx.lineTo(r.width*.30,h);ctx.lineTo(cx,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
- ctx.fillStyle='#ddd7ce';ctx.beginPath();ctx.moveTo(r.width,h);ctx.lineTo(r.width*.70,h);ctx.lineTo(cx,b);ctx.lineTo(r.width,b);ctx.closePath();ctx.fill();
- // floor trapezoid
- ctx.fillStyle='#c5bdb2';ctx.beginPath();ctx.moveTo(r.width*.30,h);ctx.lineTo(r.width*.70,h);ctx.lineTo(r.width,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
- // center corridor strips like "tracks", but clinic tile strips
+
+function drawHall(){
+ const r=cv.getBoundingClientRect(),cx=r.width/2,h=r.height*.19,b=r.height;
+ ctx.fillStyle='#eef4f5';ctx.fillRect(0,0,r.width,h+30);
+ ctx.fillStyle='#d9d4cc';ctx.beginPath();ctx.moveTo(0,h);ctx.lineTo(r.width*.27,h);ctx.lineTo(cx,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#ded8cf';ctx.beginPath();ctx.moveTo(r.width,h);ctx.lineTo(r.width*.73,h);ctx.lineTo(cx,b);ctx.lineTo(r.width,b);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#c5bdb2';ctx.beginPath();ctx.moveTo(r.width*.27,h);ctx.lineTo(r.width*.73,h);ctx.lineTo(r.width,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
  ctx.strokeStyle='#9f968c';ctx.lineWidth=2;
- for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(cx+i*r.width*.04,h);ctx.lineTo(cx+i*r.width*.18,b);ctx.stroke()}
- for(let i=1;i<14;i++){let yy=h+(b-h)*Math.pow(i/14,1.65);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(r.width,yy);ctx.stroke()}
- // wall baseboards
- ctx.strokeStyle='#aaa39a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,b*.72);ctx.lineTo(cx,h);ctx.lineTo(r.width,b*.72);ctx.stroke();
- // ceiling lights
- for(let i=1;i<8;i++){let yy=h*(i/8),ww=40+80*(i/8);ctx.fillStyle='#fff';ctx.fillRect(cx-ww/2,yy,ww,8)}
- // room doorways/signs along sides
- const sideRooms=[
-  {z:1280,x:-350,label:'NEURO GYM',side:-1},
-  {z:1280,x:0,label:'PEDIATRIC GYM',side:0},
-  {z:1280,x:350,label:'HAND THERAPY',side:1},
-  {z:1820,x:-350,label:'ADL KITCHEN',side:-1},
-  {z:1820,x:350,label:'DOCUMENTATION',side:1}
- ];
- sideRooms.forEach(rm=>{
-   const p=project(rm.z,rm.x);if(!p||p.dz>1550)return;
-   ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
-   ctx.fillStyle='#8b847b';ctx.fillRect(-70,-170,140,170);
-   ctx.fillStyle='#f4f4f2';ctx.fillRect(-55,-150,110,135);
-   ctx.fillStyle='#2f3135';ctx.font='700 14px system-ui';ctx.textAlign='center';ctx.fillText(rm.label,0,-185);
-   ctx.restore()
- });
+ for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(cx+i*r.width*.035,h);ctx.lineTo(cx+i*r.width*.16,b);ctx.stroke()}
+ for(let i=1;i<15;i++){let yy=h+(b-h)*Math.pow(i/15,1.65);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(r.width,yy);ctx.stroke()}
+ ctx.fillStyle='#fff';for(let i=1;i<8;i++){let yy=h*(i/8),ww=45+90*(i/8);ctx.fillRect(cx-ww/2,yy,ww,7)}
 }
-function drawFurniture(){
- const scene=[
-  {z:420,x:0,type:'desk',label:'RECEPTION'},
-  {z:780,x:-180,type:'computer',label:'CHART'},
-  {z:1080,x:170,type:'chair',label:'WAITING'},
-  {z:1550,x:-260,type:'mat',label:'NEURO'},
-  {z:1550,x:0,type:'swing',label:'PEDS'},
-  {z:1550,x:260,type:'table',label:'HAND'},
-  {z:2050,x:0,type:'computer',label:'DOCUMENT'},
-  {z:2500,x:0,type:'exit',label:'EXIT'}
+
+function drawDoors(){
+ const doors=[
+  {z:1470,x:-335,label:'NEURO GYM',id:'neuroDoor'},
+  {z:1470,x:0,label:'PEDIATRIC GYM',id:'pedsDoor'},
+  {z:1470,x:335,label:'HAND THERAPY',id:'handDoor'},
+  {z:1980,x:335,label:'DOCUMENTATION',id:'soapDoor'}
  ];
- scene.forEach(o=>{
-  let p=project(o.z,o.x);if(!p||p.dz>1550)return;
+ doors.forEach(d=>{
+  const p=project(d.z,d.x);if(!p||p.dz>1550)return;
   ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
-  if(o.type==='desk'){
-   ctx.fillStyle='#8e6548';ctx.fillRect(-110,-55,220,74);ctx.fillStyle='#c99d77';ctx.fillRect(-100,-47,200,18);
-   ctx.fillStyle='#3c4349';ctx.fillRect(-32,-92,64,38);ctx.fillStyle='#c4dae8';ctx.fillRect(-25,-85,50,25);
-   ctx.fillStyle='#6d4b35';ctx.fillRect(-105,19,18,55);ctx.fillRect(87,19,18,55);
-  }
-  if(o.type==='computer'){
-   ctx.fillStyle='#4e555f';ctx.fillRect(-55,-65,110,78);ctx.fillStyle='#bdd5e6';ctx.fillRect(-45,-55,90,54);
-   ctx.fillStyle='#444';ctx.fillRect(-8,13,16,28);ctx.fillRect(-28,38,56,7);
-  }
-  if(o.type==='chair'){
-   ctx.fillStyle='#6d7d90';ctx.fillRect(-45,-45,90,60);ctx.fillRect(-50,15,12,55);ctx.fillRect(38,15,12,55);ctx.fillRect(-52,-105,104,65);
-  }
-  if(o.type==='mat'){
-   ctx.fillStyle='#6f9ea5';ctx.fillRect(-115,-48,230,78);ctx.fillStyle='#c8e0e1';ctx.fillRect(-102,-38,204,55);
-   ctx.fillStyle='#737373';ctx.fillRect(-95,30,10,55);ctx.fillRect(85,30,10,55);
-  }
-  if(o.type==='swing'){
-   ctx.strokeStyle='#565d66';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-55,-150);ctx.lineTo(-25,-50);ctx.moveTo(55,-150);ctx.lineTo(25,-50);ctx.stroke();
-   ctx.fillStyle='#efc65a';ctx.beginPath();ctx.ellipse(0,-28,74,32,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#74a6bd';ctx.fillRect(-100,12,200,30);
-  }
-  if(o.type==='table'){
-   ctx.fillStyle='#bdcee5';ctx.fillRect(-100,-58,200,88);ctx.fillStyle='#6c7f9a';ctx.fillRect(-84,-45,168,50);
-   ctx.fillStyle='#777';ctx.fillRect(-78,30,12,58);ctx.fillRect(66,30,12,58);
-  }
-  if(o.type==='exit'){ctx.fillStyle='#5b745e';ctx.fillRect(-75,-155,150,188);ctx.fillStyle='#e7ece8';ctx.fillRect(-57,-140,114,100);ctx.fillStyle='#2f4e38';ctx.fillRect(38,-55,10,10)}
+  ctx.fillStyle='#7f7a72';ctx.fillRect(-70,-170,140,170);
+  ctx.fillStyle='#f1f1ee';ctx.fillRect(-56,-151,112,137);
+  ctx.fillStyle='#3d3c42';ctx.font='700 14px system-ui';ctx.textAlign='center';ctx.fillText(d.label,0,-185);
+  ctx.fillStyle='#8d8d89';ctx.beginPath();ctx.arc(42,-75,5,0,7);ctx.fill();
   ctx.restore()
  })
 }
+
+function drawLobby(){
+ // Only show lobby furniture when close to lobby.
+ if(player.z>850)return;
+ const furn=[
+  {z:420,x:0,type:'desk'},
+  {z:760,x:-210,type:'computer'},
+  {z:1080,x:190,type:'chair'}
+ ];
+ furn.forEach(o=>{
+  const p=project(o.z,o.x);if(!p||p.dz>1200)return;
+  ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
+  if(o.type==='desk'){ctx.fillStyle='#8d6548';ctx.fillRect(-112,-58,224,76);ctx.fillStyle='#c99d77';ctx.fillRect(-101,-48,202,18);ctx.fillStyle='#3c4349';ctx.fillRect(-30,-95,60,40);ctx.fillStyle='#c4dae8';ctx.fillRect(-23,-87,46,26)}
+  if(o.type==='computer'){ctx.fillStyle='#4e555f';ctx.fillRect(-55,-65,110,78);ctx.fillStyle='#bdd5e6';ctx.fillRect(-45,-55,90,54);ctx.fillStyle='#444';ctx.fillRect(-8,13,16,28);ctx.fillRect(-28,38,56,7)}
+  if(o.type==='chair'){ctx.fillStyle='#6d7d90';ctx.fillRect(-45,-45,90,60);ctx.fillRect(-50,15,12,55);ctx.fillRect(38,15,12,55);ctx.fillRect(-52,-105,104,65)}
+  ctx.restore()
+ })
+}
+
+function drawRoomInterior(){
+ if(G.room==='hall')return;
+ const r=cv.getBoundingClientRect();
+ // room walls
+ ctx.fillStyle=G.room==='neuro'?'#edf8f3':G.room==='peds'?'#fff0f6':G.room==='hand'?'#eef3ff':'#edf5fb';
+ ctx.fillRect(0,0,r.width,r.height);
+ ctx.fillStyle='#c8c2ba';ctx.fillRect(0,r.height*.62,r.width,r.height*.38);
+ ctx.strokeStyle='#b2aaa1';for(let y=r.height*.62;y<r.height;y+=42){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(r.width,y);ctx.stroke()}
+ if(G.room==='neuro'){
+   ctx.fillStyle='#78a6ab';ctx.fillRect(r.width*.18,r.height*.32,r.width*.52,90);
+   ctx.fillStyle='#cce4e6';ctx.fillRect(r.width*.21,r.height*.35,r.width*.46,55);
+   ctx.fillStyle='#e48755';for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(r.width*.18+i*45,r.height*.58);ctx.lineTo(r.width*.20+i*45,r.height*.50);ctx.lineTo(r.width*.22+i*45,r.height*.58);ctx.fill()}
+ }
+ if(G.room==='peds'){
+   ctx.strokeStyle='#626a72';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(r.width*.40,0);ctx.lineTo(r.width*.45,r.height*.34);ctx.moveTo(r.width*.60,0);ctx.lineTo(r.width*.55,r.height*.34);ctx.stroke();
+   ctx.fillStyle='#efc75a';ctx.beginPath();ctx.ellipse(r.width*.50,r.height*.40,80,34,0,0,7);ctx.fill();
+   ctx.fillStyle='#75a8bf';ctx.fillRect(r.width*.23,r.height*.58,r.width*.54,34)
+ }
+ if(G.room==='hand'){
+   ctx.fillStyle='#bed0e7';ctx.fillRect(r.width*.22,r.height*.34,r.width*.56,95);
+   ctx.fillStyle='#6c809c';ctx.fillRect(r.width*.28,r.height*.39,r.width*.44,50);
+   ctx.fillStyle='#e7c85f';ctx.beginPath();ctx.arc(r.width*.42,r.height*.55,18,0,7);ctx.fill();ctx.fillStyle='#dd829f';ctx.beginPath();ctx.arc(r.width*.58,r.height*.55,18,0,7);ctx.fill()
+ }
+ if(G.room==='soap'){
+   ctx.fillStyle='#4e555f';ctx.fillRect(r.width*.36,r.height*.28,r.width*.28,130);
+   ctx.fillStyle='#c4dae9';ctx.fillRect(r.width*.39,r.height*.32,r.width*.22,82);
+   ctx.fillStyle='#8a6a4d';ctx.fillRect(r.width*.26,r.height*.55,r.width*.48,50)
+ }
+ // door back to hall
+ ctx.fillStyle='#6e655e';ctx.fillRect(18,18,110,50);ctx.fillStyle='#fff';ctx.font='700 14px system-ui';ctx.fillText('BACK TO HALL',30,50)
+}
+
 function drawCurrentClient(){
- if(G.done||G.stage>2)return;
+ if(G.done||G.stage>2||G.room!=='hall')return;
  const s=stations.find(x=>x.id==='client'),p=project(s.z,s.x);if(!p||p.dz>1400)return;
- const c=clients[G.appt];
  const look={skin:G.appt===0?'#d1a07d':G.appt===1?'#b77954':'#9f684a',hair:G.appt===0?'#b9b2aa':'#241a17',scrub:G.appt===0?'#a989ad':G.appt===1?'#4e9fb4':'#6f8ed0',pants:'#49535d',style:G.appt===0?'short':G.appt===1?'curly':'short'};
  drawPerson(ctx,p.x,p.y,look,p.s*.8,true,false)
 }
+
 function drawScene(){
  const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);
- drawEnvironment();drawFurniture();drawCurrentClient();
- // player low/center, like the reference
+ if(G.room==='hall'){drawHall();drawDoors();drawLobby();drawCurrentClient()}
+ else drawRoomInterior();
  drawPerson(ctx,r.width/2,r.height*.84,avatar,1.0,false,G.started&&player.moving);
  requestAnimationFrame(drawScene)
 }
 drawScene();
 
 function findNear(){
+ if(G.room!=='hall'){
+  G.near={id:'back',label:'Back to Hall'};
+  hintEl.style.display='block';hintEl.textContent='Interact: Back to Hall';return
+ }
  let best=null,bd=999;
  stations.forEach(s=>{
-  if(['neuro','peds','hand'].includes(s.id)&&s.case!==G.appt)return;
+  if(['neuroDoor','pedsDoor','handDoor'].includes(s.id)&&s.case!==G.appt)return;
   let d=Math.hypot((s.z-player.z)/1.2,(s.x-player.x));
   if(d<bd){bd=d;best=s}
  });
@@ -263,10 +263,12 @@ function findNear(){
 function loop(){
  if(G.started&&!document.getElementById('overlay')){
   player.moving=!!(keys.up||keys.down||keys.left||keys.right);
-  if(keys.up)player.z+=player.speedZ;
-  if(keys.down)player.z=Math.max(0,player.z-player.speedZ);
-  if(keys.left)player.x=Math.max(-330,player.x-player.speedX);
-  if(keys.right)player.x=Math.min(330,player.x+player.speedX);
+  if(G.room==='hall'){
+   if(keys.up)player.z+=player.speedZ;
+   if(keys.down)player.z=Math.max(0,player.z-player.speedZ);
+   if(keys.left)player.x=Math.max(-340,player.x-player.speedX);
+   if(keys.right)player.x=Math.min(340,player.x+player.speedX)
+  }
   findNear()
  }
  setTimeout(loop,16)
@@ -278,43 +280,49 @@ bind('up','up');bind('down','down');bind('left','left');bind('right','right');
 document.getElementById('interact').onclick=()=>{if(!G.near)return toast('Move closer to the clinic station.');interact(G.near.id)};
 
 function interact(id){
+ if(id==='back'){G.room='hall';player.z=1450;player.x=0;return}
  if(id==='reception')return reception();
  if(id==='chart')return chart();
  if(id==='client')return clientTalk();
- if(['neuro','peds','hand'].includes(id))return treatment();
- if(id==='soap')return soap();
+ if(['neuroDoor','pedsDoor','handDoor'].includes(id))return enterTreatmentRoom(id);
+ if(id==='soapDoor')return enterSoapRoom();
  if(id==='exit')return exitDay()
 }
+function enterTreatmentRoom(id){
+ if(G.stage!==3)return toast('Complete the client interview first.');
+ const map={neuroDoor:'neuro',pedsDoor:'peds',handDoor:'hand'};
+ G.room=map[id];showTreatmentSoon()
+}
+function showTreatmentSoon(){setTimeout(()=>{let c=clients[G.appt];showChoices(c.setting,c.treat,'treat')},200)}
+function enterSoapRoom(){if(G.stage!==4)return toast('Complete treatment first.');G.room='soap';setTimeout(soap,200)}
 function reception(){
  if(G.stage===0){G.stage=1;G.min+=5;ui();overlay(`<h2>Reception</h2><p>You clock in. Your first client is <b>${clients[G.appt].name}</b>.</p><button class="btn primary" id="ok">Continue</button>`);document.getElementById('ok').onclick=closeOverlay}
  else if(G.stage===5){if(G.appt<2){G.appt++;G.stage=1;G.min+=10;player.z=380;player.x=0;ui();overlay(`<h2>Next Appointment</h2><p>${clients[G.appt].name} is ready.</p><button class="btn primary" id="ok">Continue</button>`);document.getElementById('ok').onclick=closeOverlay}else{G.done=true;ui();toast('All clients complete. Head to EXIT.')}}
 }
 function chart(){if(G.stage!==1)return toast('Not time for chart review yet.');let c=clients[G.appt];G.min+=8;ui();overlay(`<h2>${c.name} — Chart</h2><p>${c.chart}</p><p><b>Goal:</b> ${c.goal}</p><button class="btn primary" id="doneChart">Finish Chart Review</button>`);document.getElementById('doneChart').onclick=()=>{G.stage=2;G.clin+=5;closeOverlay();ui();toast('Go speak with the client.')}}
 function clientTalk(){if(G.stage!==2)return toast('Review the chart first.');let c=clients[G.appt];showChoices(c.name,c.talk,'talk')}
-function treatment(){if(G.stage!==3)return toast('Complete the client interview first.');let c=clients[G.appt];showChoices(c.setting,c.treat,'treat')}
 function showChoices(title,data,type){
  overlay(`<h2>${title}</h2><p>${data[0]}</p>${data.slice(1).map((a,i)=>`<button class="btn choice" data-i="${i+1}">${a[0]}</button>`).join('')}`);
  document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>answer(type,+b.dataset.i))
 }
 function answer(type,i){
  let c=clients[G.appt],a=c[type][i];G.clin+=a[1]*5;
- if(type==='talk'){closeOverlay();G.stage=3;ui();toast('Take the client to '+c.setting+'.');player.z=1120;return}
+ if(type==='talk'){closeOverlay();G.stage=3;ui();toast('Enter '+c.setting+'.');player.z=1300;return}
  if(type==='treat'){closeOverlay();ethics();return}
  if(type==='eth'){if(a[1]<3)G.eth-=20;closeOverlay();safety();ui();return}
- if(type==='safe'){if(a[1]<3)G.safe-=25;G.stage=4;closeOverlay();ui();player.z=1780;player.x=0;toast('Go to Documentation.');return}
+ if(type==='safe'){if(a[1]<3)G.safe-=25;G.stage=4;closeOverlay();G.room='hall';ui();player.z=1820;player.x=250;toast('Go to Documentation.');return}
 }
 function ethics(){let c=clients[G.appt];showChoices('Ethics Scenario',c.eth,'eth')}
 function safety(){let c=clients[G.appt];showChoices('Safety Event',c.safe,'safe')}
 function soap(){
- if(G.stage!==4)return toast('Complete treatment first.');
  let c=clients[G.appt];overlay(`<h2>SOAP Note — ${c.name}</h2><textarea id="S" placeholder="S — Subjective"></textarea><textarea id="O" placeholder="O — Objective"></textarea><textarea id="A" placeholder="A — Assessment"></textarea><textarea id="P" placeholder="P — Plan"></textarea><button class="btn primary" id="submitNote">Submit Note</button>`);
- document.getElementById('submitNote').onclick=()=>{let vals=['S','O','A','P'].map(id=>document.getElementById(id).value.trim());if(vals.some(v=>v.length<8))return alert('Add a little more detail to each section.');G.stage=5;career.xp+=30;career.money+=20;save();closeOverlay();ui();player.z=360;player.x=0;toast('Appointment complete. Return to Reception.')}
+ document.getElementById('submitNote').onclick=()=>{let vals=['S','O','A','P'].map(id=>document.getElementById(id).value.trim());if(vals.some(v=>v.length<8))return alert('Add a little more detail to each section.');G.stage=5;career.xp+=30;career.money+=20;save();closeOverlay();G.room='hall';ui();player.z=360;player.x=0;toast('Appointment complete. Return to Reception.')}
 }
 function exitDay(){
  if(!G.done)return toast('Finish all appointments first.');
  let final=Math.max(0,Math.min(100,Math.round(65+G.clin/12+(G.eth-100)/4+(G.safe-100)/4)));
  career.xp+=Math.round(final*.6);career.money+=Math.round(final*.25);career.day++;save();
- overlay(`<h1>Day Complete 🎉</h1><h2>${final}%</h2><p>V7 keeps your career progression for the next shift.</p><button class="btn primary" id="again">Start Next Workday</button>`);
+ overlay(`<h1>Day Complete 🎉</h1><h2>${final}%</h2><p>V8 now separates hallway travel from individual treatment rooms.</p><button class="btn primary" id="again">Start Next Workday</button>`);
  document.getElementById('again').onclick=()=>location.reload()
 }
 
