@@ -1,100 +1,182 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>OT Clinic Simulator V4</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>OT Clinic Simulator V5</title>
 <style>
-body{margin:0;font-family:system-ui;background:#e9e5ef;color:#241f2e;overflow:hidden}
-#top{height:58px;background:#fff;display:flex;justify-content:space-between;align-items:center;padding:0 12px;border-bottom:1px solid #ddd}
-#wrap{position:relative;height:calc(100vh - 58px);background:#d9e2e7}
-canvas{width:100%;height:100%;display:block}
-#obj,#sched{position:absolute;top:10px;background:#fff;border:1px solid #ddd;border-radius:12px;padding:8px 10px;font-size:12px;z-index:3}
-#obj{left:10px;max-width:240px}#sched{right:10px}
-#toast{position:absolute;left:50%;top:68px;transform:translateX(-50%);background:#292331;color:#fff;padding:9px 12px;border-radius:12px;display:none;z-index:6}
-#hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);background:#fff;padding:6px 10px;border-radius:999px;font-size:12px;display:none}
-#dpad{position:absolute;left:16px;bottom:16px;width:140px;height:140px;z-index:4}
-.c{position:absolute;width:48px;height:48px;border:0;border-radius:14px;background:#fff;font-weight:900}
+:root{--ink:#251f2e;--purple:#7357e8;--purple2:#9c76f2;--line:#ddd5e8}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#dfe6ea;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+button,textarea{font:inherit}
+#top{height:62px;background:white;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:8px 12px;gap:8px}
+#brand{font-weight:950;font-size:1.03rem}
+#stats{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.pill{font-size:.7rem;font-weight:850;background:#f4f0fb;border:1px solid #e2dceb;border-radius:999px;padding:6px 8px}
+#wrap{position:relative;height:calc(100vh - 62px);overflow:hidden}
+canvas{width:100%;height:100%;display:block;touch-action:none}
+#obj,#sched{position:absolute;top:10px;background:#fff;border:1px solid #ddd;border-radius:13px;padding:8px 10px;font-size:12px;z-index:5;box-shadow:0 4px 14px #0001}
+#obj{left:10px;max-width:230px}#sched{right:10px}
+#toast{position:absolute;left:50%;top:72px;transform:translateX(-50%);background:#292331;color:#fff;padding:9px 12px;border-radius:12px;display:none;z-index:8;max-width:80%;text-align:center}
+#hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);background:#fff;padding:6px 10px;border-radius:999px;font-size:12px;display:none;z-index:6}
+#dpad{position:absolute;left:16px;bottom:16px;width:140px;height:140px;z-index:6}
+.c{position:absolute;width:48px;height:48px;border:0;border-radius:14px;background:#fff;font-weight:900;box-shadow:0 5px 18px #0002}
 #u{left:46px}#d{left:46px;bottom:0}#l{left:0;top:46px}#r{right:0;top:46px}
-#int{position:absolute;right:18px;bottom:26px;width:88px;height:88px;border:0;border-radius:50%;background:#7657e8;color:#fff;font-weight:900;z-index:4}
+#int{position:absolute;right:18px;bottom:26px;width:90px;height:90px;border:0;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-weight:900;z-index:6;box-shadow:0 8px 20px #6048b955}
 .ov{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:14px;z-index:20}
-.p{background:#fff;border-radius:20px;padding:18px;max-width:760px;width:100%;max-height:90vh;overflow:auto}
+.p{background:#fff;border-radius:22px;padding:18px;max-width:760px;width:100%;max-height:90vh;overflow:auto}
 .btn{width:100%;padding:12px;margin:6px 0;border:0;border-radius:13px;background:#f0ecf8;font-weight:800;text-align:left}
 .pri{background:#7657e8;color:#fff;text-align:center}
 .note{padding:11px;border-radius:12px;margin:9px 0}.good{background:#e1f6eb}.bad{background:#ffe4ea}.info{background:#edf4ff}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-textarea{width:100%;min-height:72px;border:1px solid #ccc;border-radius:10px;padding:8px}
-#speech{position:absolute;background:#fff;border:2px solid #333;border-radius:12px;padding:8px;font-size:12px;display:none;z-index:5;max-width:180px}
-.mini{height:210px;background:#f4f7fb;border-radius:15px;position:relative;overflow:hidden}
-.target{position:absolute;right:30px;top:55px;width:120px;height:90px;border:3px dashed #4d9c70;border-radius:15px}
-.drag{position:absolute;left:25px;top:110px;width:60px;height:60px;background:#7657e8;color:#fff;border-radius:14px;display:grid;place-items:center;font-weight:900;touch-action:none}
-@media(max-width:650px){.grid{grid-template-columns:1fr}}
+textarea{width:100%;min-height:72px;border:1px solid #ccc;border-radius:10px;padding:8px;margin:4px 0}
+@media(max-width:650px){#sched{max-width:145px}#obj{max-width:190px}}
 </style>
 </head>
 <body>
-<div id="top"><b>🧠 OT Clinic Simulator V4</b><div id="stats"></div></div>
+<div id="top"><div id="brand">🧠 OT Clinic Simulator V5</div><div id="stats"></div></div>
 <div id="wrap">
-<canvas id="g"></canvas><div id="obj"></div><div id="sched"></div><div id="toast"></div><div id="hint"></div><div id="speech"></div>
+<canvas id="g"></canvas><div id="obj"></div><div id="sched"></div><div id="toast"></div><div id="hint"></div>
 <div id="dpad"><button class="c" id="u">▲</button><button class="c" id="d">▼</button><button class="c" id="l">◀</button><button class="c" id="r">▶</button></div>
 <button id="int">INTERACT</button>
 </div>
 <script>
-const cv=document.getElementById('g'),x=cv.getContext('2d'),W=1100,H=700;
-let s=1,K={u:0,d:0,l:0,r:0},tick=0;
-let career={xp:+localStorage.ot4xp||0,money:+localStorage.ot4money||0,day:+localStorage.ot4day||1};
+const cv=document.getElementById('g'),ctx=cv.getContext('2d'),W=1500,H=1000;
+let scale=1,keys={u:0,d:0,l:0,r:0},frame=0;
+let career={xp:+localStorage.v5xp||0,money:+localStorage.v5money||0,day:+localStorage.v5day||1};
 let G={stage:0,appt:0,eth:100,safe:100,clin:0,min:480,near:null,follow:false,prog:[0,0,0],soap:[],done:false};
-let P={x:120,y:625,sp:3};
-const cases=[
-{name:'Maria',emoji:'👵',room:'Neuro Gym',chart:'Right CVA; left hemiparesis; fall risk; possible left neglect.',talk:['My daughter can just dress me.',['Ask what parts of dressing matter most to her.',3],['Agree and let family do it.',0]],treat:['She misses items on the left.',['Use functional scanning/neglect strategies.',3],['Ignore it.',0]],eth:['Neighbor asks for an update.',['Do not disclose without permission.',3],['Give a brief update.',0]],safe:['She gets pale and dizzy.',['Stop, secure her, and follow facility emergency procedure.',3],['Push through.',0]],mini:'transfer',keys:['dress','home','transfer','scan','safety','continue']},
-{name:'Eli',emoji:'🧒',room:'Pediatric Gym',chart:'Autism; sensory differences; toothbrushing and morning routine concerns.',talk:['Can I use the swing?',['Use it for regulation then transition toward self-care.',3],['Force him to the table.',0]],treat:['Choose intervention.',['Visual schedule + toothbrushing through play.',3],['Remove all preferred activities.',0]],eth:['Parent asks for a guarantee.',['Explain progress varies and use measurable goals.',3],['Guarantee independence in 2 weeks.',0]],safe:['He coughs after mouthing a toy piece.',['Follow emergency procedure and get appropriate help.',3],['Wait until session ends.',0]],mini:'sequence',keys:['parent','toothbrush','morning','visual','cue','continue']},
-{name:'Jordan',emoji:'✂️',room:'Hand Therapy',chart:'Distal radius fracture 8 weeks post-op; return-to-work goal.',talk:['Push my wrist as hard as possible.',['Explain graded loading and precautions.',3],['Agree because client asked.',0]],treat:['Choose intervention.',['Graded salon-task simulation with pacing.',3],['Max resistance despite precautions.',0]],eth:['Can I double my pain meds?',['Refer medication questions to prescriber.',3],['Recommend doubling.',0]],safe:['New severe swelling and color change.',['Stop and escalate per clinic/medical procedure.',3],['Continue strengthening.',0]],mini:'rom',keys:['work','pain','hair','rom','task','continue']}
+const P={x:210,y:860,sp:4,facing:'up',moving:false};
+const avatar={skin:'#d89d77',hair:'#2b1f1b',scrub:'#7c64dc',pants:'#3e4a5a'};
+const clients=[
+ {name:'Maria',emoji:'👵',skin:'#d3a07c',hair:'#b9b2aa',scrub:'#b28ab3',room:'Neuro Gym',chart:'Right CVA, left hemiparesis, fall risk, possible left neglect.',talk:['My daughter can just dress me.',['Ask what parts of dressing matter most to her.',3],['Agree and let family do it.',0]],treat:['She misses items on the left.',['Use functional scanning and neglect strategies.',3],['Ignore it.',0]],eth:['Neighbor asks for an update.',['Do not disclose without permission.',3],['Give a brief update.',0]],safe:['She gets pale and dizzy.',['Stop, secure her, and follow facility emergency procedure.',3],['Push through.',0]],keys:['dress','home','transfer','scan','safety','continue']},
+ {name:'Eli',emoji:'🧒',skin:'#b77954',hair:'#2b211c',scrub:'#4f9fb5',room:'Pediatric Gym',chart:'Autism, sensory differences, toothbrushing and morning routine concerns.',talk:['Can I use the swing?',['Use it for regulation then transition toward self-care.',3],['Force him to the table.',0]],treat:['Choose intervention.',['Visual schedule plus toothbrushing through play.',3],['Remove all preferred activities.',0]],eth:['Parent asks for a guarantee.',['Explain progress varies and use measurable goals.',3],['Guarantee independence in 2 weeks.',0]],safe:['He coughs after mouthing a toy piece.',['Follow emergency procedure and get appropriate help.',3],['Wait until session ends.',0]],keys:['parent','toothbrush','morning','visual','cue','continue']},
+ {name:'Jordan',emoji:'✂️',skin:'#9f684a',hair:'#1f1816',scrub:'#6f8fd0',room:'Hand Therapy',chart:'Distal radius fracture, 8 weeks post-op; return-to-work goal.',talk:['Push my wrist as hard as possible.',['Explain graded loading and precautions.',3],['Agree because client asked.',0]],treat:['Choose intervention.',['Graded salon-task simulation with pacing.',3],['Max resistance despite precautions.',0]],eth:['Can I double my pain meds?',['Refer medication questions to prescriber.',3],['Recommend doubling.',0]],safe:['New severe swelling and color change.',['Stop and escalate per clinic/medical procedure.',3],['Continue strengthening.',0]],keys:['work','pain','hair','rom','task','continue']}
 ];
-const objs=[['rec',55,70,170,60],['chart',75,390,70,50],['client',120,150,60,60],['neuro',350,80,160,110],['peds',625,75,160,130],['hand',880,75,150,130],['soap',900,500,90,60],['exit',1000,620,60,35]];
-function rs(){const r=cv.parentElement.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;x.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);s=Math.min(r.width/W,r.height/H)}addEventListener('resize',rs);rs();
-function stat(){stats.innerHTML=`Day ${career.day} • XP ${career.xp} • $${career.money} • Ethics ${G.eth} • Safety ${G.safe}`}
-function clock(){let h=Math.floor(G.min/60),m=G.min%60,ap=h>=12?'PM':'AM';return `${h%12||12}:${String(m).padStart(2,'0')} ${ap}`}
-function ui(){let c=cases[G.appt],t=G.done?'Go to EXIT.':G.stage==0?'Clock in at Reception.':G.stage==1?`Review ${c.name}'s chart.`:G.stage==2?`Talk to ${c.name}.`:G.stage==3?`Walk with ${c.name} to ${c.room}.`:G.stage==4?`Document ${c.name}.`:'Return to Reception.';obj.innerHTML='<b>Objective</b><br>'+t;sched.innerHTML='<b>'+clock()+'</b><br>'+cases.map((c,i)=>(i<G.appt?'✅ ':i==G.appt?'➡️ ':'• ')+c.name).join('<br>');stat()}
-function toast(t){toast.textContent=t;toast.style.display='block';clearTimeout(toast._);toast._=setTimeout(()=>toast.style.display='none',2000)}
+const rooms=[
+ [60,60,360,850,'#f6eee6','WAITING / FRONT DESK'],
+ [460,60,310,300,'#eef8f3','NEURO GYM'],
+ [810,60,310,300,'#fff0f6','PEDIATRIC GYM'],
+ [1160,60,280,300,'#eef3ff','HAND THERAPY'],
+ [460,400,310,260,'#fff6e9','ADL KITCHEN'],
+ [810,400,310,260,'#f4eef8','STORAGE'],
+ [1160,400,280,260,'#edf5fb','DOCUMENTATION'],
+ [460,700,310,210,'#f5f8ef','OPEN REHAB'],
+ [810,700,310,210,'#f8f2eb','SUPPLIES'],
+ [1160,700,280,210,'#eef0f4','STAFF / EXIT']
+];
+const objs=[
+ ['rec',100,110,210,80],['chart',140,610,90,60],['client',160,260,70,70],
+ ['neuro',540,150,160,120],['peds',900,135,160,150],['hand',1230,135,150,150],
+ ['soap',1240,520,100,70],['exit',1330,840,70,40]
+];
+
+function resize(){let r=cv.parentElement.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);scale=Math.max(.58,Math.min(1,r.height/760));}
+addEventListener('resize',resize);resize();
+function stat(){stats.innerHTML=`<span class=pill>Day ${career.day}</span><span class=pill>XP ${career.xp}</span><span class=pill>$${career.money}</span><span class=pill>Ethics ${G.eth}</span><span class=pill>Safety ${G.safe}</span>`}
+function time(){let h=Math.floor(G.min/60),m=G.min%60,ap=h>=12?'PM':'AM';return `${h%12||12}:${String(m).padStart(2,'0')} ${ap}`}
+function ui(){let c=clients[G.appt],t=G.done?'Go to EXIT.':G.stage==0?'Clock in at Reception.':G.stage==1?`Review ${c.name}'s chart.`:G.stage==2?`Talk to ${c.name}.`:G.stage==3?`Walk with ${c.name} to ${c.room}.`:G.stage==4?`Document ${c.name}.`:'Return to Reception.';obj.innerHTML='<b>Objective</b><br>'+t;sched.innerHTML='<b>'+time()+'</b><br>'+clients.map((c,i)=>(i<G.appt?'✅ ':i==G.appt?'➡️ ':'• ')+c.name).join('<br>');stat()}
+function toastMsg(t){toast.textContent=t;toast.style.display='block';clearTimeout(toast._);toast._=setTimeout(()=>toast.style.display='none',2000)}
 function ov(h){let d=document.createElement('div');d.className='ov';d.id='ov';d.innerHTML='<div class=p>'+h+'</div>';document.body.appendChild(d)}
 function closeov(){document.getElementById('ov')?.remove()}
-function speech(t,px,py){speech.textContent=t;speech.style.left=(px*s)+'px';speech.style.top=(py*s)+'px';speech.style.display='block';setTimeout(()=>speech.style.display='none',2200)}
+function drawHuman(x,y,a,facing='down',moving=false,scaleH=1){
+ ctx.save();ctx.translate(x,y);
+ let bob=moving?Math.sin(frame/5)*2:0;ctx.translate(0,bob);
+ // shadow
+ ctx.fillStyle='#0002';ctx.beginPath();ctx.ellipse(0,30*scaleH,18*scaleH,6*scaleH,0,0,Math.PI*2);ctx.fill();
+ // legs
+ let step=moving?Math.sin(frame/4)*6:0;
+ ctx.fillStyle=a.pants||'#3c4652';
+ ctx.fillRect(-12*scaleH,22*scaleH+step,9*scaleH,24*scaleH);
+ ctx.fillRect(3*scaleH,22*scaleH-step,9*scaleH,24*scaleH);
+ // shoes
+ ctx.fillStyle='#292d33';ctx.fillRect(-14*scaleH,44*scaleH+step,12*scaleH,6*scaleH);ctx.fillRect(2*scaleH,44*scaleH-step,12*scaleH,6*scaleH);
+ // torso scrub top
+ ctx.fillStyle=a.scrub;ctx.beginPath();ctx.roundRect(-18*scaleH,-3*scaleH,36*scaleH,30*scaleH,7*scaleH);ctx.fill();
+ // arms
+ ctx.fillStyle=a.skin;ctx.fillRect(-23*scaleH,4*scaleH,6*scaleH,22*scaleH);ctx.fillRect(17*scaleH,4*scaleH,6*scaleH,22*scaleH);
+ // neck
+ ctx.fillRect(-5*scaleH,-12*scaleH,10*scaleH,10*scaleH);
+ // head
+ ctx.beginPath();ctx.ellipse(0,-29*scaleH,15*scaleH,18*scaleH,0,0,Math.PI*2);ctx.fill();
+ // ears
+ ctx.beginPath();ctx.arc(-15*scaleH,-29*scaleH,3*scaleH,0,7);ctx.arc(15*scaleH,-29*scaleH,3*scaleH,0,7);ctx.fill();
+ // hair
+ ctx.fillStyle=a.hair;ctx.beginPath();ctx.arc(0,-34*scaleH,15*scaleH,Math.PI,Math.PI*2);ctx.fill();
+ ctx.fillRect(-14*scaleH,-35*scaleH,28*scaleH,5*scaleH);
+ // eyes/nose/mouth for more human look
+ ctx.fillStyle='#30262b';ctx.beginPath();ctx.arc(-5*scaleH,-29*scaleH,1.3*scaleH,0,7);ctx.arc(5*scaleH,-29*scaleH,1.3*scaleH,0,7);ctx.fill();
+ ctx.strokeStyle='#9b6f58';ctx.lineWidth=1.2*scaleH;ctx.beginPath();ctx.moveTo(0,-28*scaleH);ctx.lineTo(-1*scaleH,-23*scaleH);ctx.stroke();
+ ctx.strokeStyle='#7d4f4f';ctx.beginPath();ctx.arc(0,-19*scaleH,4*scaleH,.15,Math.PI-.15);ctx.stroke();
+ // badge
+ ctx.fillStyle='#fff';ctx.fillRect(6*scaleH,3*scaleH,8*scaleH,11*scaleH);ctx.fillStyle='#8092a5';ctx.fillRect(8*scaleH,5*scaleH,4*scaleH,2*scaleH);
+ ctx.restore();
+}
+function drawFurniture(camX,camY){
+ rooms.forEach(r=>{ctx.fillStyle=r[4];ctx.fillRect(r[0]-camX,r[1]-camY,r[2],r[3]);ctx.fillStyle='#5d5664';ctx.font='700 14px system-ui';ctx.fillText(r[5],r[0]-camX+12,r[1]-camY+24)});
+ // reception
+ ctx.fillStyle='#8d694c';ctx.fillRect(100-camX,110-camY,210,80);ctx.fillStyle='#d9b695';ctx.fillRect(110-camX,120-camY,190,22);
+ drawHuman(260-camX,150-camY,{skin:'#b77957',hair:'#2a201d',scrub:'#5f9b7c',pants:'#39454b'},'down',false,.9);
+ // chairs
+ ctx.fillStyle='#6f7f93';for(let yy of [270,360,450])ctx.fillRect(110-camX,yy-camY,58,48);
+ // chart pc
+ ctx.fillStyle='#4f5560';ctx.fillRect(140-camX,610-camY,90,60);ctx.fillStyle='#bcd8ee';ctx.fillRect(150-camX,620-camY,70,36);
+ // neuro
+ ctx.fillStyle='#75a8ae';ctx.fillRect(540-camX,150-camY,160,120);ctx.fillStyle='#c6e0e3';ctx.fillRect(557-camX,168-camY,126,70);
+ // peds
+ ctx.fillStyle='#f0c85c';ctx.beginPath();ctx.arc(980-camX,195-camY,52,0,7);ctx.fill();
+ ctx.fillStyle='#78a9c0';ctx.fillRect(875-camX,285-camY,210,30);
+ // hand table
+ ctx.fillStyle='#c1d2ec';ctx.fillRect(1230-camX,135-camY,150,150);ctx.fillStyle='#6d819e';ctx.fillRect(1250-camX,158-camY,110,48);
+ // kitchen
+ ctx.fillStyle='#a67554';ctx.fillRect(520-camX,470-camY,190,40);ctx.fillStyle='#d5b18e';ctx.fillRect(532-camX,480-camY,165,20);
+ // supplies
+ ctx.fillStyle='#8a6c50';ctx.fillRect(880-camX,765-camY,180,110);
+ // documentation
+ ctx.fillStyle='#555a67';ctx.fillRect(1240-camX,520-camY,100,70);ctx.fillStyle='#c4d9ef';ctx.fillRect(1253-camX,532-camY,74,40);
+ // exit
+ ctx.fillStyle='#486b59';ctx.fillRect(1330-camX,840-camY,70,40);ctx.fillStyle='#fff';ctx.fillText('EXIT',1348-camX,865-camY);
+}
 function draw(){
- let r=cv.getBoundingClientRect(),ox=(r.width-W*s)/2,oy=(r.height-H*s)/2;x.clearRect(0,0,r.width,r.height);x.save();x.translate(ox,oy);x.scale(s,s);
- x.fillStyle='#dce5e9';x.fillRect(0,0,W,H);
- const rooms=[[20,20,260,660,'#f8efe7','WAITING'],[300,20,250,230,'#eef8f3','NEURO GYM'],[570,20,250,230,'#fff0f6','PEDIATRIC GYM'],[840,20,240,230,'#eef3ff','HAND THERAPY'],[300,270,250,190,'#fff6e9','ADL KITCHEN'],[570,270,250,190,'#f4eef8','STORAGE'],[840,270,240,190,'#edf5fb','DOCUMENTATION'],[300,480,250,200,'#f5f8ef','OPEN REHAB'],[570,480,250,200,'#f8f2eb','SUPPLIES'],[840,480,240,200,'#eef0f4','STAFF/EXIT']];
- rooms.forEach(a=>{x.fillStyle=a[4];x.fillRect(a[0],a[1],a[2],a[3]);x.fillStyle='#555';x.font='700 12px system-ui';x.fillText(a[5],a[0]+10,a[1]+22)});
- x.fillStyle='#8b8790';[[0,0,1100,20],[0,680,1100,20],[0,0,20,700],[1080,0,20,700],[280,20,15,660],[550,20,15,660],[820,20,15,660],[295,250,525,15],[295,460,525,15]].forEach(a=>x.fillRect(...a));
- x.fillStyle='#8d694c';x.fillRect(55,70,170,60);x.fillStyle='#d9b695';x.fillRect(65,80,150,18);
- x.fillStyle='#545863';x.fillRect(75,390,70,50);x.fillStyle='#bdd8ee';x.fillRect(84,398,52,30);
- x.fillStyle='#76a9ae';x.fillRect(350,80,160,110);x.fillStyle='#f0c75c';x.beginPath();x.arc(700,140,42,0,7);x.fill();x.fillStyle='#c2d3ec';x.fillRect(880,75,150,130);
- x.fillStyle='#555a67';x.fillRect(900,500,90,60);x.fillStyle='#c4d9ef';x.fillRect(912,510,66,34);x.fillStyle='#496b59';x.fillRect(1000,620,60,35);x.fillStyle='#fff';x.fillText('EXIT',1014,641);
- if(G.stage<=2&&!G.follow&&!G.done){x.font='32px system-ui';x.fillText(cases[G.appt].emoji,145,G.appt==0?175:G.appt==1?235:295);x.fillStyle='#ddd';x.fillRect(180,G.appt==0?155:G.appt==1?215:275,90,8);x.fillStyle='#67b789';x.fillRect(180,G.appt==0?155:G.appt==1?215:275,90*G.prog[G.appt]/100,8)}
- if(G.follow){x.font='32px system-ui';x.fillText(cases[G.appt].emoji,P.x+35,P.y+10)}
- x.fillStyle='#0003';x.beginPath();x.ellipse(P.x,P.y+18,10,4,0,0,7);x.fill();x.fillStyle='#7657e8';x.fillRect(P.x-10,P.y-5,20,24);x.fillStyle='#dca17a';x.beginPath();x.arc(P.x,P.y-15,9,0,7);x.fill();x.fillStyle='#241b18';x.beginPath();x.arc(P.x,P.y-19,9,Math.PI,Math.PI*2);x.fill();
- x.restore();requestAnimationFrame(draw)
-}draw();
-function near(){let b=null,d=999;objs.forEach(o=>{if(['neuro','peds','hand'].includes(o[0])&&['neuro','peds','hand'][G.appt]!=o[0])return;let dd=Math.hypot(P.x-(o[1]+o[3]/2),P.y-(o[2]+o[4]/2));if(dd<d){d=dd;b=o}});if(b&&d<85){G.near=b;hint.style.display='block';hint.textContent='Interact: '+b[0]}else{G.near=null;hint.style.display='none'}}
-function loop(){if(!document.getElementById('ov')){let dx=(K.r-K.l)*P.sp,dy=(K.d-K.u)*P.sp;if(P.x+dx>25&&P.x+dx<1075)P.x+=dx;if(P.y+dy>25&&P.y+dy<675)P.y+=dy;near()}setTimeout(loop,16)}loop();
-function bind(id,k){let e=document.getElementById(id);e.onpointerdown=a=>{a.preventDefault();K[k]=1};e.onpointerup=e.onpointerleave=()=>K[k]=0}bind('u','u');bind('d','d');bind('l','l');bind('r','r');
-int.onclick=()=>{if(!G.near)return toast('Move closer.');let id=G.near[0];if(id=='rec')rec();else if(id=='chart')chart();else if(id=='client')client();else if(['neuro','peds','hand'].includes(id))treat();else if(id=='soap')soap();else if(id=='exit')exitDay()}
-function rec(){if(G.stage==0){G.stage=1;G.min+=5;ui();speech('Morning! First client is ready.',180,95);ov(`<h2>Reception</h2><p>Clock in and review ${cases[G.appt].name}'s chart.</p><button class="btn pri" onclick="closeov()">Clock In</button>`)}else if(G.stage==5){if(G.appt<2){G.appt++;G.stage=1;G.follow=false;G.min+=10;ui();ov(`<h2>Next Appointment</h2><p>${cases[G.appt].name} is ready.</p><button class="btn pri" onclick="closeov()">Continue</button>`)}else{G.done=true;ui();toast('All clients complete. Go to EXIT.')}}}
-function chart(){if(G.stage!=1)return toast('Not time yet.');let c=cases[G.appt];G.min+=8;G.prog[G.appt]=10;ui();ov(`<h2>${c.name} — Chart</h2><p>${c.chart}</p><button class="btn pri" onclick="closeov();G.stage=2;G.clin+=5;ui()">Finish Chart Review</button>`)}
-function client(){if(G.stage!=2)return toast('Review the chart first.');let c=cases[G.appt];speech(c.talk[0],150,G.appt==0?170:G.appt==1?230:290);ov(`<h2>${c.name}</h2><p>${c.talk[0]}</p>${c.talk.slice(1).map((a,i)=>`<button class="btn" onclick="ans('talk',${i+1})">${a[0]}</button>`).join('')}`)}
-function treat(){if(G.stage!=3)return toast('Bring the client back first.');let c=cases[G.appt];G.follow=false;G.min+=5;ui();ov(`<h2>${c.room}</h2><p>${c.treat[0]}</p>${c.treat.slice(1).map((a,i)=>`<button class="btn" onclick="ans('treat',${i+1})">${a[0]}</button>`).join('')}`)}
-function ans(type,i){let c=cases[G.appt],a=c[type][i];G.clin+=a[1]*4;G.prog[G.appt]+=type=='talk'?10:15;closeov();if(type=='talk'){G.stage=3;G.follow=true;G.min+=4;ui();toast('Client is following you. Go to '+c.room)}else mini(c.mini)}
-function mini(t){if(t=='transfer')ov(`<h2>Mini-Game: Transfer Setup</h2><p>Drag the gait belt into the green target.</p><div class=mini id=ms><div class=target></div><div class=drag id=drag>BELT</div></div><button class="btn" onclick="miniDone(false)">Skip</button>`),dragSetup();else if(t=='sequence')ov(`<h2>Mini-Game: Morning Routine</h2><p>Tap in order:</p><button class=btn onclick="seq(1,this)">1. Shirt</button><button class=btn onclick="seq(3,this)">3. Brush teeth</button><button class=btn onclick="seq(2,this)">2. Pants</button>`),window.ex=1;else ov(`<h2>Mini-Game: Graded Wrist ROM</h2><input id=rom type=range min=0 max=100 value=20 style="width:100%"><p>Target: 45–70</p><button class="btn pri" onclick="checkRom()">Set Range</button>`)}
-function dragSetup(){let it=drag,st=ms,D=0,ox=0,oy=0;it.onpointerdown=e=>{D=1;let r=it.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top};onpointermove=e=>{if(!D)return;let r=st.getBoundingClientRect();it.style.left=Math.max(0,Math.min(r.width-60,e.clientX-r.left-ox))+'px';it.style.top=Math.max(0,Math.min(r.height-60,e.clientY-r.top-oy))+'px'};onpointerup=()=>{if(!D)return;D=0;let a=it.getBoundingClientRect(),b=st.getBoundingClientRect();if((a.left-b.left)>b.width*.55)miniDone(true)}}
-function seq(n,e){if(n==window.ex){e.disabled=true;e.style.background='#e1f6eb';window.ex++;if(window.ex==4)miniDone(true)}}
-function checkRom(){let v=+rom.value;if(v>=45&&v<=70)miniDone(true);else toast('Aim for the graded middle zone.')}
-function miniDone(ok){if(ok){G.clin+=10;G.prog[G.appt]+=20}else G.clin+=2;closeov();ethics()}
-function ethics(){let c=cases[G.appt];ov(`<h2>Ethics Scenario</h2><p>${c.eth[0]}</p>${c.eth.slice(1).map((a,i)=>`<button class=btn onclick="ethAns(${i+1})">${a[0]}</button>`).join('')}`)}
-function ethAns(i){let a=cases[G.appt].eth[i];G.clin+=a[1]*4;if(a[1]<3)G.eth-=20;G.prog[G.appt]+=10;G.min+=6;ui();closeov();safety()}
-function safety(){let c=cases[G.appt];ov(`<h2>Safety Event</h2><p>${c.safe[0]}</p>${c.safe.slice(1).map((a,i)=>`<button class=btn onclick="safeAns(${i+1})">${a[0]}</button>`).join('')}`)}
-function safeAns(i){let a=cases[G.appt].safe[i];G.clin+=a[1]*5;if(a[1]<3)G.safe-=25;G.prog[G.appt]+=10;G.min+=8;G.stage=4;ui();closeov();toast('Go document at the computer.')}
-function soap(){if(G.stage!=4)return toast('Finish treatment first.');let c=cases[G.appt];ov(`<h2>SOAP — ${c.name}</h2><p>Client progress: ${G.prog[G.appt]}%</p><textarea id=S placeholder="S"></textarea><textarea id=O placeholder="O"></textarea><textarea id=A placeholder="A"></textarea><textarea id=P2 placeholder="P"></textarea><button class="btn pri" onclick="submitSoap()">Submit</button>`)}
-function submitSoap(){let vals=[S.value,O.value,A.value,P2.value];if(vals.some(v=>v.trim().length<8))return alert('Add more detail.');let all=vals.join(' ').toLowerCase(),hits=cases[G.appt].keys.filter(k=>all.includes(k)).length,score=Math.min(12,hits*2);G.soap.push(score);G.prog[G.appt]=Math.min(100,G.prog[G.appt]+15);G.min+=10;G.stage=5;career.xp+=25;career.money+=18;localStorage.ot4xp=career.xp;localStorage.ot4money=career.money;ui();closeov();toast('Appointment complete. Return to Reception.')}
-function exitDay(){if(!G.done)return toast('Finish all clients first.');let avg=G.soap.reduce((a,b)=>a+b,0)/G.soap.length,final=Math.max(0,Math.min(100,Math.round(60+G.clin/15+(G.eth-100)/4+(G.safe-100)/4)));career.xp+=Math.round(final*.6);career.money+=Math.round(final*.25);career.day++;localStorage.ot4xp=career.xp;localStorage.ot4money=career.money;localStorage.ot4day=career.day;ov(`<h1>Day Complete 🎉</h1><h2>${final}%</h2><p>Average SOAP: ${Math.round(avg)}/12</p><p>Next workday: Day ${career.day}</p><button class="btn pri" onclick="location.reload()">Start Next Day</button>`)}
-ui();ov(`<h1>OT Clinic Simulator V4</h1><p>New in V4: speech bubbles, an in-game clock, client progress bars, transfer/dressing/ROM mini-games, and persistent workdays.</p><button class="btn pri" onclick="closeov()">Start Day ${career.day}</button>`);
+ frame++;
+ let r=cv.getBoundingClientRect();
+ ctx.clearRect(0,0,r.width,r.height);
+ // camera follows player
+ let camX=Math.max(0,Math.min(W-r.width/scale,P.x-r.width/(2*scale)));
+ let camY=Math.max(0,Math.min(H-r.height/scale,P.y-r.height/(2*scale)));
+ ctx.save();ctx.scale(scale,scale);
+ ctx.fillStyle='#dce5e9';ctx.fillRect(0,0,r.width/scale,r.height/scale);
+ drawFurniture(camX,camY);
+ // current client
+ let cy=G.appt==0?300:G.appt==1?390:480;
+ if(G.stage<=2&&!G.follow&&!G.done){
+   let c=clients[G.appt];
+   drawHuman(205-camX,cy-camY,{skin:c.skin,hair:c.hair,scrub:c.scrub,pants:'#4b5560'},'down',false,.95);
+   ctx.fillStyle='#ddd';ctx.fillRect(240-camX,cy-camY-55,100,9);ctx.fillStyle='#67b789';ctx.fillRect(240-camX,cy-camY-55,G.prog[G.appt],9);
+ }
+ if(G.follow){
+   let c=clients[G.appt];
+   drawHuman(P.x+55-camX,P.y+18-camY,{skin:c.skin,hair:c.hair,scrub:c.scrub,pants:'#4b5560'},'down',true,.95);
+ }
+ drawHuman(P.x-camX,P.y-camY,avatar,P.facing,P.moving,1.05);
+ ctx.restore();requestAnimationFrame(draw)
+}
+draw();
+function near(){let b=null,d=999;objs.forEach(o=>{if(['neuro','peds','hand'].includes(o[0])&&['neuro','peds','hand'][G.appt]!=o[0])return;let dd=Math.hypot(P.x-(o[1]+o[3]/2),P.y-(o[2]+o[4]/2));if(dd<d){d=dd;b=o}});if(b&&d<105){G.near=b;hint.style.display='block';hint.textContent='Interact: '+b[0]}else{G.near=null;hint.style.display='none'}}
+function loop(){if(!document.getElementById('ov')){let dx=(keys.r-keys.l)*P.sp,dy=(keys.d-keys.u)*P.sp;P.moving=!!(dx||dy);if(dx<0)P.facing='left';if(dx>0)P.facing='right';if(dy<0)P.facing='up';if(dy>0)P.facing='down';P.x=Math.max(35,Math.min(W-35,P.x+dx));P.y=Math.max(35,Math.min(H-35,P.y+dy));near()}setTimeout(loop,16)}loop();
+function bind(id,k){let e=document.getElementById(id);e.onpointerdown=a=>{a.preventDefault();keys[k]=1};e.onpointerup=e.onpointerleave=()=>keys[k]=0}bind('u','u');bind('d','d');bind('l','l');bind('r','r');
+int.onclick=()=>{if(!G.near)return toastMsg('Move closer.');let id=G.near[0];if(id=='rec')rec();else if(id=='chart')chart();else if(id=='client')client();else if(['neuro','peds','hand'].includes(id))treat();else if(id=='soap')soap();else if(id=='exit')exitDay()}
+function rec(){if(G.stage==0){G.stage=1;G.min+=5;ui();ov(`<h2>Reception</h2><p>Clock in and review ${clients[G.appt].name}'s chart.</p><button class="btn pri" onclick="closeov()">Clock In</button>`)}else if(G.stage==5){if(G.appt<2){G.appt++;G.stage=1;G.follow=false;G.min+=10;ui();ov(`<h2>Next Appointment</h2><p>${clients[G.appt].name} is ready.</p><button class="btn pri" onclick="closeov()">Continue</button>`)}else{G.done=true;ui();toastMsg('All clients complete. Go to EXIT.')}}}
+function chart(){if(G.stage!=1)return toastMsg('Not time yet.');let c=clients[G.appt];G.min+=8;G.prog[G.appt]=10;ui();ov(`<h2>${c.name} — Chart</h2><p>${c.chart}</p><button class="btn pri" onclick="closeov();G.stage=2;G.clin+=5;ui()">Finish Chart Review</button>`)}
+function client(){if(G.stage!=2)return toastMsg('Review the chart first.');let c=clients[G.appt];ov(`<h2>${c.name}</h2><p>${c.talk[0]}</p>${c.talk.slice(1).map((a,i)=>`<button class="btn" onclick="ans('talk',${i+1})">${a[0]}</button>`).join('')}`)}
+function treat(){if(G.stage!=3)return toastMsg('Bring the client back first.');let c=clients[G.appt];G.follow=false;G.min+=5;ui();ov(`<h2>${c.room}</h2><p>${c.treat[0]}</p>${c.treat.slice(1).map((a,i)=>`<button class="btn" onclick="ans('treat',${i+1})">${a[0]}</button>`).join('')}`)}
+function ans(type,i){let c=clients[G.appt],a=c[type][i];G.clin+=a[1]*4;G.prog[G.appt]+=type=='talk'?10:20;closeov();if(type=='talk'){G.stage=3;G.follow=true;G.min+=4;ui();toastMsg('Client is following you. Go to '+c.room)}else ethics()}
+function ethics(){let c=clients[G.appt];ov(`<h2>Ethics Scenario</h2><p>${c.eth[0]}</p>${c.eth.slice(1).map((a,i)=>`<button class=btn onclick="ethAns(${i+1})">${a[0]}</button>`).join('')}`)}
+function ethAns(i){let a=clients[G.appt].eth[i];G.clin+=a[1]*4;if(a[1]<3)G.eth-=20;G.prog[G.appt]+=10;G.min+=6;ui();closeov();safety()}
+function safety(){let c=clients[G.appt];ov(`<h2>Safety Event</h2><p>${c.safe[0]}</p>${c.safe.slice(1).map((a,i)=>`<button class=btn onclick="safeAns(${i+1})">${a[0]}</button>`).join('')}`)}
+function safeAns(i){let a=clients[G.appt].safe[i];G.clin+=a[1]*5;if(a[1]<3)G.safe-=25;G.prog[G.appt]+=10;G.min+=8;G.stage=4;ui();closeov();toastMsg('Go document at the computer.')}
+function soap(){if(G.stage!=4)return toastMsg('Finish treatment first.');let c=clients[G.appt];ov(`<h2>SOAP — ${c.name}</h2><p>Client progress: ${G.prog[G.appt]}%</p><textarea id=S placeholder="S"></textarea><textarea id=O placeholder="O"></textarea><textarea id=A placeholder="A"></textarea><textarea id=P2 placeholder="P"></textarea><button class="btn pri" onclick="submitSoap()">Submit</button>`)}
+function submitSoap(){let vals=[S.value,O.value,A.value,P2.value];if(vals.some(v=>v.trim().length<8))return alert('Add more detail.');let all=vals.join(' ').toLowerCase(),hits=clients[G.appt].keys.filter(k=>all.includes(k)).length,score=Math.min(12,hits*2);G.soap.push(score);G.prog[G.appt]=Math.min(100,G.prog[G.appt]+20);G.min+=10;G.stage=5;career.xp+=25;career.money+=18;localStorage.v5xp=career.xp;localStorage.v5money=career.money;ui();closeov();toastMsg('Appointment complete. Return to Reception.')}
+function exitDay(){if(!G.done)return toastMsg('Finish all clients first.');let avg=G.soap.reduce((a,b)=>a+b,0)/G.soap.length,final=Math.max(0,Math.min(100,Math.round(60+G.clin/15+(G.eth-100)/4+(G.safe-100)/4)));career.xp+=Math.round(final*.6);career.money+=Math.round(final*.25);career.day++;localStorage.v5xp=career.xp;localStorage.v5money=career.money;localStorage.v5day=career.day;ov(`<h1>Day Complete 🎉</h1><h2>${final}%</h2><p>Average SOAP: ${Math.round(avg)}/12</p><p>Next workday: Day ${career.day}</p><button class="btn pri" onclick="location.reload()">Start Next Day</button>`)}
+ui();ov(`<h1>OT Clinic Simulator V5</h1><p><b>V5 visual upgrade:</b> larger human-style characters, facial features, uniforms, walking animation, and a camera that follows you through the clinic instead of showing the entire building at once.</p><button class="btn pri" onclick="closeov()">Start Day ${career.day}</button>`);
 </script>
 </body>
 </html>
