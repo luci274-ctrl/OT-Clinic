@@ -3,93 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>OT Clinic Simulator V6</title>
+<title>OT Clinic Simulator V7</title>
 <style>
-:root{--ink:#231f2b;--purple:#7457e8;--purple2:#9a74f1;--line:#ddd6e8;--paper:#fff}
+:root{--ink:#241f2d;--purple:#7357e8;--purple2:#9c76f2;--line:#ddd6e8}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;overflow:hidden;background:#dce4e8;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
-button,input,select,textarea{font:inherit}
-#top{height:62px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:8px 12px;gap:8px;position:relative;z-index:10}
+html,body{margin:0;height:100%;overflow:hidden;background:#dfe7ea;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+button,select,textarea{font:inherit}
+#top{height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:8px 12px;gap:8px;position:relative;z-index:12}
 #brand{font-weight:950;font-size:1.02rem}
 #stats{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.pill{font-size:.7rem;font-weight:850;background:#f4f0fb;border:1px solid #e2dceb;border-radius:999px;padding:6px 8px}
-#wrap{position:relative;height:calc(100vh - 62px);overflow:hidden;background:#cfdbe0}
+.pill{font-size:.69rem;font-weight:850;background:#f4f0fb;border:1px solid #e2dceb;border-radius:999px;padding:6px 8px}
+#wrap{position:relative;height:calc(100vh - 60px);overflow:hidden;background:#bfcdd2}
 canvas{width:100%;height:100%;display:block;touch-action:none}
-#objective,#schedule{position:absolute;top:10px;background:#fff;border:1px solid #ddd;border-radius:13px;padding:8px 10px;font-size:12px;z-index:6;box-shadow:0 4px 14px #0001}
-#objective{left:10px;max-width:220px}#schedule{right:10px;max-width:155px}
-#toast{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#292331;color:#fff;padding:9px 12px;border-radius:12px;display:none;z-index:9;max-width:80%;text-align:center}
-#hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#fff;padding:7px 10px;border-radius:999px;font-size:12px;display:none;z-index:7}
-#controls{position:absolute;inset:0;pointer-events:none;z-index:7}
-#dpad{position:absolute;left:16px;bottom:18px;width:145px;height:145px;pointer-events:auto}
-.ctrl{position:absolute;width:50px;height:50px;border:0;border-radius:15px;background:#fffffff0;font-weight:900;box-shadow:0 5px 18px #0002;color:#372f43}
-#up{left:47px;top:0}#down{left:47px;bottom:0}#left{left:0;top:47px}#right{right:0;top:47px}
-#interact{position:absolute;right:18px;bottom:28px;width:92px;height:92px;border:0;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-weight:950;pointer-events:auto;box-shadow:0 9px 23px #6048b955}
+#objective,#schedule{position:absolute;top:10px;background:#fff;border:1px solid #ddd;border-radius:13px;padding:8px 10px;font-size:12px;z-index:7;box-shadow:0 4px 14px #0001}
+#objective{left:10px;max-width:215px}#schedule{right:10px;max-width:150px}
+#toast{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#292331;color:white;padding:9px 12px;border-radius:12px;display:none;z-index:10;max-width:82%;text-align:center}
+#hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#fff;padding:7px 10px;border-radius:999px;font-size:12px;display:none;z-index:8}
+#controls{position:absolute;inset:0;pointer-events:none;z-index:8}
+#dpad{position:absolute;left:16px;bottom:18px;width:150px;height:150px;pointer-events:auto}
+.ctrl{position:absolute;width:52px;height:52px;border:0;border-radius:15px;background:#fffffff0;font-weight:900;box-shadow:0 5px 18px #0002;color:#372f43}
+#up{left:49px;top:0}#down{left:49px;bottom:0}#left{left:0;top:49px}#right{right:0;top:49px}
+#interact{position:absolute;right:18px;bottom:28px;width:94px;height:94px;border:0;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple2));color:white;font-weight:950;pointer-events:auto;box-shadow:0 9px 23px #6048b955}
 .overlay{position:fixed;inset:0;background:#0009;display:grid;place-items:center;padding:14px;z-index:30;overflow:auto}
-.panel{background:#fff;border-radius:23px;padding:18px;max-width:820px;width:100%;max-height:92vh;overflow:auto}
+.panel{background:white;border-radius:23px;padding:18px;max-width:830px;width:100%;max-height:92vh;overflow:auto}
 h1,h2,h3,p{margin-top:0}.muted{color:#6f6879;line-height:1.5}.small{font-size:.88rem}
 .btn{width:100%;padding:12px 13px;margin:6px 0;border:0;border-radius:13px;background:#f0ecf8;font-weight:800;text-align:left}
-.primary{background:linear-gradient(90deg,var(--purple),var(--purple2));color:#fff;text-align:center}
-.secondary{background:#fff;border:1px solid var(--line);text-align:center}
-.note{padding:11px 12px;border-radius:13px;margin:9px 0}.good{background:#e2f6ec}.bad{background:#ffe4ea}.info{background:#edf4ff}
+.primary{background:linear-gradient(90deg,var(--purple),var(--purple2));color:white;text-align:center}
+.note{padding:11px 12px;border-radius:13px;margin:9px 0}.info{background:#edf4ff}.good{background:#e2f6ec}.bad{background:#ffe4ea}
 .creator{display:grid;grid-template-columns:300px 1fr;gap:16px}
-.preview{height:390px;border-radius:19px;background:linear-gradient(#cfe5ef 0 45%,#c9c3b9 45%);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.preview{height:390px;border-radius:19px;background:linear-gradient(#cfe6ef 0 45%,#c6bfb4 45%);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
 .group{background:#f8f5fc;border:1px solid var(--line);border-radius:17px;padding:13px;margin-bottom:9px}
 .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .swatch{width:36px;height:36px;border-radius:50%;border:3px solid transparent}.swatch.selected{border-color:#241f2b}
-select{width:100%;padding:10px;border:1px solid #d5cde0;border-radius:12px;background:#fff;margin-top:8px}
+select{width:100%;padding:10px;border:1px solid #d5cde0;border-radius:12px;background:white;margin-top:8px}
 textarea{width:100%;min-height:75px;border:1px solid #ccc;border-radius:11px;padding:9px;margin:4px 0}
 @media(max-width:700px){.creator{grid-template-columns:1fr}.preview{height:280px}#objective{max-width:180px}}
 </style>
 </head>
 <body>
-<div id="top"><div id="brand">🧠 OT Clinic Simulator V6</div><div id="stats"></div></div>
+<div id="top"><div id="brand">🧠 OT Clinic Simulator V7</div><div id="stats"></div></div>
 <div id="wrap">
 <canvas id="game"></canvas>
 <div id="objective"></div><div id="schedule"></div><div id="toast"></div><div id="hint"></div>
 <div id="controls">
- <div id="dpad"><button class="ctrl" id="up">▲</button><button class="ctrl" id="down">▼</button><button class="ctrl" id="left">◀</button><button class="ctrl" id="right">▶</button></div>
- <button id="interact">INTERACT</button>
+<div id="dpad"><button class="ctrl" id="up">▲</button><button class="ctrl" id="down">▼</button><button class="ctrl" id="left">◀</button><button class="ctrl" id="right">▶</button></div>
+<button id="interact">INTERACT</button>
 </div>
 </div>
-
 <script>
 const cv=document.getElementById('game'),ctx=cv.getContext('2d');
 const statsEl=document.getElementById('stats'),objEl=document.getElementById('objective'),schedEl=document.getElementById('schedule');
 const toastEl=document.getElementById('toast'),hintEl=document.getElementById('hint');
 
 const skinTones=['#f2c9aa','#dfa47e','#c48762','#9b6247','#74442f','#513020'];
-const hairColors=['#1e1715','#3a251e','#6a422c','#a56e42','#d7c3a9','#111111'];
+const hairColors=['#1e1715','#3a251e','#6a422c','#a56e42','#d7c3a9','#111'];
 const scrubColors=['#765fe0','#4d9eaf','#db789b','#5d9c76','#698ccc','#b576c7','#2f7f82'];
-const pantsColors=['#29323b','#3e4a58','#263649','#44404b'];
 const hairStyles=['bun','long','braids','curly','short','ponytail'];
-let avatar={skin:skinTones[1],hair:hairColors[0],scrub:scrubColors[0],pants:pantsColors[0],style:'bun',name:'Student OT'};
+let avatar={skin:skinTones[1],hair:hairColors[0],scrub:scrubColors[0],pants:'#263649',style:'bun'};
 
-let career={xp:+localStorage.v6xp||0,money:+localStorage.v6money||0,day:+localStorage.v6day||1};
-let G={started:false,stage:0,appt:0,eth:100,safe:100,clin:0,min:480,near:null,done:false,progress:[0,0,0]};
+let career={xp:+localStorage.v7xp||0,money:+localStorage.v7money||0,day:+localStorage.v7day||1};
+let G={started:false,stage:0,appt:0,eth:100,safe:100,clin:0,min:480,near:null,done:false};
 let keys={up:0,down:0,left:0,right:0};
-const player={lane:0,z:0,speed:4.2,moving:false};
+const player={x:0,z:0,speedZ:5.0,speedX:4.8,moving:false};
+
 const clients=[
- {name:'Maria',setting:'Neuro',goal:'Dress independently',chart:'Right CVA with left hemiparesis. Fall risk. Possible left neglect.',talk:['“My daughter can just dress me.”',['Ask what parts of dressing she wants to do independently.',3],['Agree and let family do everything.',0]],treat:['Maria misses grooming items on her left.',['Use functional scanning and neglect strategies.',3],['Ignore the missed items.',0]],eth:['A neighbor asks for a therapy update.',['Do not disclose without permission.',3],['Give a quick update.',0]],safe:['Maria becomes pale and dizzy.',['Stop, secure her, and follow facility emergency procedure.',3],['Tell her to push through.',0]]},
- {name:'Eli',setting:'Pediatrics',goal:'Improve morning self-care',chart:'Autism and sensory processing differences. Toothbrushing and transition concerns.',talk:['“Can I use the swing?”',['Use it for regulation, then transition toward self-care.',3],['Force him directly to the table.',0]],treat:['Choose the best intervention.',['Visual schedule plus toothbrushing through play.',3],['Remove preferred activities until compliance.',0]],eth:['Parent asks for a guaranteed outcome.',['Explain progress varies and use measurable goals.',3],['Guarantee success in two weeks.',0]],safe:['Eli begins coughing after mouthing a toy part.',['Follow emergency procedure and obtain appropriate help.',3],['Wait until the session ends.',0]]},
- {name:'Jordan',setting:'Hand Therapy',goal:'Return to hairstyling',chart:'Distal radius fracture, 8 weeks post-op. Follow protocol. Work task limitations.',talk:['“Push my wrist as hard as possible.”',['Explain graded loading and precautions.',3],['Agree because the client requested it.',0]],treat:['Choose the best intervention.',['Graded salon-task simulation with pacing.',3],['Maximal resistance despite precautions.',0]],eth:['Jordan asks whether to double pain medication.',['Refer medication question to prescriber.',3],['Recommend doubling medication.',0]],safe:['New severe swelling and color change appear.',['Stop and escalate per clinic/medical procedures.',3],['Continue strengthening.',0]]}
+ {name:'Maria',setting:'Neuro Gym',goal:'Dress independently',chart:'Right CVA with left hemiparesis. Fall risk. Possible left neglect.',
+ talk:['“My daughter can just dress me.”',['Ask what parts of dressing she wants to do independently.',3],['Agree and let family do everything.',0]],
+ treat:['Maria misses grooming items on her left.',['Use functional scanning and neglect strategies.',3],['Ignore the missed items.',0]],
+ eth:['A neighbor asks for a therapy update.',['Do not disclose without permission.',3],['Give a quick update.',0]],
+ safe:['Maria becomes pale and dizzy.',['Stop, secure her, and follow facility emergency procedure.',3],['Tell her to push through.',0]]},
+ {name:'Eli',setting:'Pediatric Gym',goal:'Improve morning self-care',chart:'Autism and sensory processing differences. Toothbrushing and transition concerns.',
+ talk:['“Can I use the swing?”',['Use it for regulation, then transition toward self-care.',3],['Force him directly to the table.',0]],
+ treat:['Choose the best intervention.',['Visual schedule plus toothbrushing through play.',3],['Remove preferred activities until compliance.',0]],
+ eth:['Parent asks for a guaranteed outcome.',['Explain progress varies and use measurable goals.',3],['Guarantee success in two weeks.',0]],
+ safe:['Eli begins coughing after mouthing a toy part.',['Follow emergency procedure and obtain appropriate help.',3],['Wait until the session ends.',0]]},
+ {name:'Jordan',setting:'Hand Therapy',goal:'Return to hairstyling',chart:'Distal radius fracture, 8 weeks post-op. Follow protocol. Work task limitations.',
+ talk:['“Push my wrist as hard as possible.”',['Explain graded loading and precautions.',3],['Agree because the client requested it.',0]],
+ treat:['Choose the best intervention.',['Graded salon-task simulation with pacing.',3],['Maximal resistance despite precautions.',0]],
+ eth:['Jordan asks whether to double pain medication.',['Refer medication question to prescriber.',3],['Recommend doubling medication.',0]],
+ safe:['New severe swelling and color change appear.',['Stop and escalate per clinic/medical procedures.',3],['Continue strengthening.',0]]}
 ];
 
-// "World" arranged down a long corridor for a Subway-Surfers-like chase camera.
+// Corridor locations. x is true lateral position, not discrete lanes.
 const stations=[
- {id:'reception',z:380,lane:0,label:'Reception Desk'},
- {id:'chart',z:760,lane:-1,label:'Chart Computer'},
- {id:'client',z:1050,lane:1,label:'Waiting Client'},
- {id:'neuro',z:1450,lane:-1,label:'Neuro Gym',case:0},
- {id:'peds',z:1450,lane:0,label:'Pediatric Gym',case:1},
- {id:'hand',z:1450,lane:1,label:'Hand Therapy',case:2},
- {id:'soap',z:1900,lane:0,label:'Documentation Computer'},
- {id:'exit',z:2350,lane:0,label:'Clinic Exit'}
+ {id:'reception',z:420,x:0,label:'Reception'},
+ {id:'chart',z:780,x:-180,label:'Chart Computer'},
+ {id:'client',z:1080,x:170,label:'Waiting Client'},
+ {id:'neuro',z:1550,x:-260,label:'Neuro Gym',case:0},
+ {id:'peds',z:1550,x:0,label:'Pediatric Gym',case:1},
+ {id:'hand',z:1550,x:260,label:'Hand Therapy',case:2},
+ {id:'soap',z:2050,x:0,label:'Documentation'},
+ {id:'exit',z:2500,x:0,label:'Exit'}
 ];
 
-function resize(){let r=cv.parentElement.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+function resize(){const r=cv.parentElement.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
 addEventListener('resize',resize);resize();
 
-function save(){localStorage.v6xp=career.xp;localStorage.v6money=career.money;localStorage.v6day=career.day}
+function save(){localStorage.v7xp=career.xp;localStorage.v7money=career.money;localStorage.v7day=career.day}
 function stat(){statsEl.innerHTML=`<span class="pill">Day ${career.day}</span><span class="pill">XP ${career.xp}</span><span class="pill">$${career.money}</span><span class="pill">Ethics ${G.eth}</span><span class="pill">Safety ${G.safe}</span>`}
 function time(){let h=Math.floor(G.min/60),m=G.min%60,ap=h>=12?'PM':'AM';return `${h%12||12}:${String(m).padStart(2,'0')} ${ap}`}
 function ui(){let c=clients[G.appt],t=G.done?'Walk to the clinic exit.':G.stage===0?'Go to Reception and clock in.':G.stage===1?`Review ${c.name}'s chart.`:G.stage===2?`Talk to ${c.name} in the waiting area.`:G.stage===3?`Take ${c.name} to ${c.setting}.`:G.stage===4?`Document ${c.name}'s session.`:'Return to Reception.';objEl.innerHTML='<b>Objective</b><br>'+t;schedEl.innerHTML=`<b>${time()}</b><br>${clients.map((c,i)=>(i<G.appt?'✅ ':i===G.appt&&!G.done?'➡️ ':'• ')+c.name).join('<br>')}`;stat()}
@@ -98,147 +108,144 @@ function overlay(html){let d=document.createElement('div');d.className='overlay'
 function closeOverlay(){document.getElementById('overlay')?.remove()}
 
 function creator(){
- overlay(`<h1>Create Your OT</h1>
- <p class="muted">Everyone in your class can make their own character before entering the clinic.</p>
- <div class="creator">
-  <div class="preview"><canvas id="previewCanvas" width="300" height="390"></canvas></div>
-  <div>
-   <div class="group"><b>Skin tone</b><div class="swatches">${skinTones.map(c=>`<button class="swatch ${avatar.skin===c?'selected':''}" data-kind="skin" data-value="${c}" style="background:${c}"></button>`).join('')}</div></div>
-   <div class="group"><b>Hair color</b><div class="swatches">${hairColors.map(c=>`<button class="swatch ${avatar.hair===c?'selected':''}" data-kind="hair" data-value="${c}" style="background:${c}"></button>`).join('')}</div></div>
-   <div class="group"><b>Scrub color</b><div class="swatches">${scrubColors.map(c=>`<button class="swatch ${avatar.scrub===c?'selected':''}" data-kind="scrub" data-value="${c}" style="background:${c}"></button>`).join('')}</div></div>
-   <div class="group"><label><b>Hair style</b><select id="styleSelect">${hairStyles.map(s=>`<option ${avatar.style===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
-  </div>
- </div>
- <div class="note info"><b>Camera:</b> V6 uses a behind-the-character perspective like Subway Surfers rather than the overhead map view.</div>
+ overlay(`<h1>Create Your OT</h1><p class="muted">Customize your character, then enter the new over-the-shoulder clinic view.</p>
+ <div class="creator"><div class="preview"><canvas id="previewCanvas" width="300" height="390"></canvas></div>
+ <div>
+ <div class="group"><b>Skin tone</b><div class="swatches">${skinTones.map(c=>`<button class="swatch ${avatar.skin===c?'selected':''}" data-k="skin" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
+ <div class="group"><b>Hair color</b><div class="swatches">${hairColors.map(c=>`<button class="swatch ${avatar.hair===c?'selected':''}" data-k="hair" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
+ <div class="group"><b>Scrub color</b><div class="swatches">${scrubColors.map(c=>`<button class="swatch ${avatar.scrub===c?'selected':''}" data-k="scrub" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
+ <div class="group"><label><b>Hair style</b><select id="styleSelect">${hairStyles.map(s=>`<option ${avatar.style===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
+ </div></div>
+ <div class="note info"><b>V7 movement:</b> you can now move continuously left/right across the hallway, not just snap between lanes.</div>
  <button class="btn primary" id="startBtn">Enter Clinic</button>`);
- document.querySelectorAll('.swatch').forEach(b=>b.addEventListener('click',()=>{avatar[b.dataset.kind]=b.dataset.value;closeOverlay();creator()}));
- document.getElementById('styleSelect').addEventListener('change',e=>{avatar.style=e.target.value;drawPreview()});
- document.getElementById('startBtn').addEventListener('click',()=>{closeOverlay();G.started=true;ui();toast('Walk forward to Reception.')});
+ document.querySelectorAll('.swatch').forEach(b=>b.onclick=()=>{avatar[b.dataset.k]=b.dataset.v;closeOverlay();creator()});
+ document.getElementById('styleSelect').onchange=e=>{avatar.style=e.target.value;drawPreview()};
+ document.getElementById('startBtn').onclick=()=>{closeOverlay();G.started=true;ui();toast('Move forward to Reception.')};
  setTimeout(drawPreview,20);
 }
-function drawPreview(){let p=document.getElementById('previewCanvas');if(!p)return;let c=p.getContext('2d');c.clearRect(0,0,p.width,p.height);drawPerson(c,150,260,avatar,2.4,true,0)}
+function drawPreview(){let p=document.getElementById('previewCanvas');if(!p)return;let c=p.getContext('2d');c.clearRect(0,0,p.width,p.height);drawPerson(c,150,260,avatar,2.4,true,false)}
 
-function drawPerson(c,x,y,a,scale=1,front=false,walk=0){
+function drawPerson(c,x,y,a,s=1,front=false,moving=false){
  c.save();c.translate(x,y);
- // shadow
- c.fillStyle='#0002';c.beginPath();c.ellipse(0,48*scale,27*scale,8*scale,0,0,Math.PI*2);c.fill();
- // legs
- let st=walk?Math.sin(Date.now()/100)*8:0;
- c.fillStyle=a.pants||'#394652';c.fillRect(-17*scale,17*scale+st,13*scale,37*scale);c.fillRect(4*scale,17*scale-st,13*scale,37*scale);
- // shoes
- c.fillStyle='#262b30';c.fillRect(-20*scale,50*scale+st,18*scale,7*scale);c.fillRect(2*scale,50*scale-st,18*scale,7*scale);
- // torso shaped like scrub top
- c.fillStyle=a.scrub;c.beginPath();c.moveTo(-28*scale,-21*scale);c.quadraticCurveTo(0,-31*scale,28*scale,-21*scale);c.lineTo(22*scale,25*scale);c.lineTo(-22*scale,25*scale);c.closePath();c.fill();
- // v-neck
- c.fillStyle='#fff8';c.beginPath();c.moveTo(-7*scale,-23*scale);c.lineTo(0,-13*scale);c.lineTo(7*scale,-23*scale);c.closePath();c.fill();
- // arms/hands
- c.fillStyle=a.skin;c.beginPath();c.roundRect(-36*scale,-15*scale,10*scale,42*scale,5*scale);c.fill();c.beginPath();c.roundRect(26*scale,-15*scale,10*scale,42*scale,5*scale);c.fill();
- // neck/head
- c.fillRect(-7*scale,-35*scale,14*scale,12*scale);c.beginPath();c.ellipse(0,-58*scale,22*scale,27*scale,0,0,Math.PI*2);c.fill();
- // hair silhouettes
+ let step=moving?Math.sin(Date.now()/95)*7:0;
+ c.fillStyle='#0002';c.beginPath();c.ellipse(0,50*s,28*s,8*s,0,0,Math.PI*2);c.fill();
+ c.fillStyle=a.pants||'#36414c';c.fillRect(-17*s,18*s+step,13*s,38*s);c.fillRect(4*s,18*s-step,13*s,38*s);
+ c.fillStyle='#262b30';c.fillRect(-20*s,52*s+step,18*s,7*s);c.fillRect(2*s,52*s-step,18*s,7*s);
+ c.fillStyle=a.scrub;c.beginPath();c.moveTo(-28*s,-20*s);c.quadraticCurveTo(0,-30*s,28*s,-20*s);c.lineTo(22*s,26*s);c.lineTo(-22*s,26*s);c.closePath();c.fill();
+ c.fillStyle=a.skin;c.beginPath();c.roundRect(-36*s,-14*s,10*s,43*s,5*s);c.fill();c.beginPath();c.roundRect(26*s,-14*s,10*s,43*s,5*s);c.fill();
+ c.fillRect(-7*s,-35*s,14*s,12*s);c.beginPath();c.ellipse(0,-58*s,22*s,27*s,0,0,Math.PI*2);c.fill();
  c.fillStyle=a.hair;
- if(a.style==='short'){c.beginPath();c.arc(0,-68*scale,22*scale,Math.PI,Math.PI*2);c.fill()}
- if(a.style==='bun'){c.beginPath();c.arc(0,-68*scale,22*scale,Math.PI,Math.PI*2);c.fill();c.beginPath();c.arc(0,-85*scale,10*scale,0,Math.PI*2);c.fill()}
- if(a.style==='long'){c.fillRect(-22*scale,-73*scale,44*scale,40*scale);c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-58*scale,20*scale,25*scale,0,0,Math.PI*2);c.fill();c.fillStyle=a.hair;c.beginPath();c.arc(0,-70*scale,22*scale,Math.PI,Math.PI*2);c.fill()}
- if(a.style==='curly'){for(let xx=-18;xx<=18;xx+=9){c.beginPath();c.arc(xx*scale,-72*scale,8*scale,0,Math.PI*2);c.fill()}}
- if(a.style==='ponytail'){c.beginPath();c.arc(0,-68*scale,22*scale,Math.PI,Math.PI*2);c.fill();c.beginPath();c.ellipse(25*scale,-52*scale,8*scale,18*scale,-.25,0,Math.PI*2);c.fill()}
- if(a.style==='braids'){c.beginPath();c.arc(0,-68*scale,22*scale,Math.PI,Math.PI*2);c.fill();c.fillRect(-22*scale,-62*scale,6*scale,43*scale);c.fillRect(16*scale,-62*scale,6*scale,43*scale)}
- if(front){
-   c.fillStyle='#32262b';c.beginPath();c.arc(-7*scale,-59*scale,2*scale,0,7);c.arc(7*scale,-59*scale,2*scale,0,7);c.fill();
-   c.strokeStyle='#945f58';c.lineWidth=1.4*scale;c.beginPath();c.arc(0,-48*scale,6*scale,.2,Math.PI-.2);c.stroke();
- }
- // badge
- c.fillStyle='#fff';c.fillRect(9*scale,-9*scale,10*scale,14*scale);c.fillStyle='#90a4b5';c.fillRect(11*scale,-6*scale,6*scale,3*scale);
- c.restore();
+ if(a.style==='short'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill()}
+ if(a.style==='bun'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill();c.beginPath();c.arc(0,-86*s,10*s,0,Math.PI*2);c.fill()}
+ if(a.style==='long'){c.fillRect(-22*s,-73*s,44*s,42*s);c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-58*s,20*s,25*s,0,0,Math.PI*2);c.fill();c.fillStyle=a.hair;c.beginPath();c.arc(0,-70*s,22*s,Math.PI,Math.PI*2);c.fill()}
+ if(a.style==='curly'){for(let xx=-18;xx<=18;xx+=9){c.beginPath();c.arc(xx*s,-72*s,8*s,0,Math.PI*2);c.fill()}}
+ if(a.style==='ponytail'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill();c.beginPath();c.ellipse(25*s,-52*s,8*s,18*s,-.25,0,Math.PI*2);c.fill()}
+ if(a.style==='braids'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill();c.fillRect(-22*s,-62*s,6*s,44*s);c.fillRect(16*s,-62*s,6*s,44*s)}
+ if(front){c.fillStyle='#32262b';c.beginPath();c.arc(-7*s,-59*s,2*s,0,7);c.arc(7*s,-59*s,2*s,0,7);c.fill();c.strokeStyle='#945f58';c.lineWidth=1.4*s;c.beginPath();c.arc(0,-48*s,6*s,.2,Math.PI-.2);c.stroke()}
+ c.fillStyle='#fff';c.fillRect(9*s,-9*s,10*s,14*s);c.restore();
 }
 
-function project(worldZ,lane){
+// Subway-Surfers-style perspective: wide foreground, narrow distance.
+function project(z,x){
  const r=cv.getBoundingClientRect();
- let dz=worldZ-player.z;
- const horizon=r.height*.22, nearY=r.height*.82;
- let depth=Math.max(80,dz+150);
- let k=Math.min(1.9,600/depth);
- let y=horizon+(nearY-horizon)*(1-Math.min(1,dz/1050));
- let x=r.width/2+lane*(r.width*.22)*k;
- return{x,y,k,dz};
+ const dz=z-player.z;
+ if(dz<-120)return null;
+ const horizon=r.height*.18, bottom=r.height*.86;
+ const t=Math.max(0,Math.min(1,dz/1500));
+ const y=bottom-(bottom-horizon)*Math.pow(t,.72);
+ const widthAtY=r.width*(.92-(.72*t));
+ const px=r.width/2 + (x-player.x)*(widthAtY/720);
+ const s=Math.max(.18,1.55*(1-t)+.15);
+ return {x:px,y,s,dz,t,widthAtY}
 }
-function drawFloor(){
- const r=cv.getBoundingClientRect(),cx=r.width/2,h=r.height*.21,b=r.height;
- ctx.fillStyle='#b8c4c8';ctx.fillRect(0,0,r.width,r.height);
- // ceiling/walls
- ctx.fillStyle='#eef3f4';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(r.width,0);ctx.lineTo(r.width*.72,h);ctx.lineTo(r.width*.28,h);ctx.closePath();ctx.fill();
- ctx.fillStyle='#dad4ca';ctx.beginPath();ctx.moveTo(0,h);ctx.lineTo(r.width*.28,h);ctx.lineTo(cx,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
- ctx.fillStyle='#ded8ce';ctx.beginPath();ctx.moveTo(r.width,h);ctx.lineTo(r.width*.72,h);ctx.lineTo(cx,b);ctx.lineTo(r.width,b);ctx.closePath();ctx.fill();
- // corridor floor trapezoid
- ctx.fillStyle='#c7c0b7';ctx.beginPath();ctx.moveTo(r.width*.28,h);ctx.lineTo(r.width*.72,h);ctx.lineTo(r.width,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
- // floor tiles perspective
- ctx.strokeStyle='#b2aaa0';ctx.lineWidth=1;
- for(let i=0;i<12;i++){let yy=h+(b-h)*(i/12)**1.7;ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(r.width,yy);ctx.stroke()}
- for(let lane=-3;lane<=3;lane++){ctx.beginPath();ctx.moveTo(cx+lane*r.width*.045,h);ctx.lineTo(cx+lane*r.width*.18,b);ctx.stroke()}
+function drawEnvironment(){
+ const r=cv.getBoundingClientRect(),cx=r.width/2,h=r.height*.18,b=r.height;
+ // sky/ceiling
+ ctx.fillStyle='#edf5f6';ctx.fillRect(0,0,r.width,h+40);
+ // side walls with corridor opening
+ ctx.fillStyle='#d8d3ca';ctx.beginPath();ctx.moveTo(0,h);ctx.lineTo(r.width*.30,h);ctx.lineTo(cx,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#ddd7ce';ctx.beginPath();ctx.moveTo(r.width,h);ctx.lineTo(r.width*.70,h);ctx.lineTo(cx,b);ctx.lineTo(r.width,b);ctx.closePath();ctx.fill();
+ // floor trapezoid
+ ctx.fillStyle='#c5bdb2';ctx.beginPath();ctx.moveTo(r.width*.30,h);ctx.lineTo(r.width*.70,h);ctx.lineTo(r.width,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
+ // center corridor strips like "tracks", but clinic tile strips
+ ctx.strokeStyle='#9f968c';ctx.lineWidth=2;
+ for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(cx+i*r.width*.04,h);ctx.lineTo(cx+i*r.width*.18,b);ctx.stroke()}
+ for(let i=1;i<14;i++){let yy=h+(b-h)*Math.pow(i/14,1.65);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(r.width,yy);ctx.stroke()}
+ // wall baseboards
+ ctx.strokeStyle='#aaa39a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,b*.72);ctx.lineTo(cx,h);ctx.lineTo(r.width,b*.72);ctx.stroke();
  // ceiling lights
- for(let i=1;i<7;i++){let yy=h*(i/7);let ww=35+80*(i/7);ctx.fillStyle='#ffffffcc';ctx.fillRect(cx-ww/2,yy,ww,7)}
-}
-function drawFurniture(){
- // room signs and "real" furniture positioned in perspective.
- const objects=[
-  {z:380,lane:0,type:'desk',label:'RECEPTION'},
-  {z:760,lane:-1,type:'computer',label:'CHART'},
-  {z:1050,lane:1,type:'chair',label:'WAITING'},
-  {z:1450,lane:-1,type:'mat',label:'NEURO'},
-  {z:1450,lane:0,type:'swing',label:'PEDS'},
-  {z:1450,lane:1,type:'table',label:'HAND'},
-  {z:1900,lane:0,type:'computer',label:'DOCUMENT'},
-  {z:2350,lane:0,type:'door',label:'EXIT'}
+ for(let i=1;i<8;i++){let yy=h*(i/8),ww=40+80*(i/8);ctx.fillStyle='#fff';ctx.fillRect(cx-ww/2,yy,ww,8)}
+ // room doorways/signs along sides
+ const sideRooms=[
+  {z:1280,x:-350,label:'NEURO GYM',side:-1},
+  {z:1280,x:0,label:'PEDIATRIC GYM',side:0},
+  {z:1280,x:350,label:'HAND THERAPY',side:1},
+  {z:1820,x:-350,label:'ADL KITCHEN',side:-1},
+  {z:1820,x:350,label:'DOCUMENTATION',side:1}
  ];
- objects.forEach(o=>{
-   let p=project(o.z,o.lane);if(p.dz<-120||p.dz>1450)return;
-   let sc=Math.max(.18,Math.min(1.8,p.k));
-   ctx.save();ctx.translate(p.x,p.y);ctx.scale(sc,sc);
-   if(o.type==='desk'){
-     ctx.fillStyle='#8e6548';ctx.fillRect(-100,-55,200,70);ctx.fillStyle='#c99d77';ctx.fillRect(-92,-48,184,16);
-     ctx.fillStyle='#363d43';ctx.fillRect(-22,-84,44,30);ctx.fillStyle='#c5d9e8';ctx.fillRect(-17,-79,34,20);
-     ctx.fillStyle='#f7f3ed';ctx.fillRect(-34,15,68,6);
-   }
-   if(o.type==='computer'){
-     ctx.fillStyle='#4e555f';ctx.fillRect(-50,-60,100,70);ctx.fillStyle='#bdd5e6';ctx.fillRect(-41,-51,82,48);
-     ctx.fillStyle='#444';ctx.fillRect(-7,10,14,25);ctx.fillRect(-25,32,50,6);
-   }
-   if(o.type==='chair'){
-     ctx.fillStyle='#6d7d90';ctx.fillRect(-42,-40,84,55);ctx.fillRect(-48,15,12,50);ctx.fillRect(36,15,12,50);
-     ctx.fillRect(-48,-95,96,58);
-   }
-   if(o.type==='mat'){
-     ctx.fillStyle='#6f9ea5';ctx.fillRect(-110,-45,220,75);ctx.fillStyle='#c8e0e1';ctx.fillRect(-98,-35,196,52);
-     ctx.fillStyle='#737373';ctx.fillRect(-95,30,10,50);ctx.fillRect(85,30,10,50);
-   }
-   if(o.type==='swing'){
-     ctx.strokeStyle='#555c66';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-55,-150);ctx.lineTo(-25,-50);ctx.moveTo(55,-150);ctx.lineTo(25,-50);ctx.stroke();
-     ctx.fillStyle='#efc65a';ctx.beginPath();ctx.ellipse(0,-30,70,30,0,0,Math.PI*2);ctx.fill();
-     ctx.fillStyle='#74a6bd';ctx.fillRect(-95,10,190,28);
-   }
-   if(o.type==='table'){
-     ctx.fillStyle='#bdcee5';ctx.fillRect(-95,-55,190,85);ctx.fillStyle='#6c7f9a';ctx.fillRect(-80,-43,160,48);
-     ctx.fillStyle='#767676';ctx.fillRect(-75,30,12,55);ctx.fillRect(63,30,12,55);
-     ctx.fillStyle='#e9c861';ctx.beginPath();ctx.arc(-30,-5,15,0,7);ctx.fill();ctx.fillStyle='#dc7e9d';ctx.beginPath();ctx.arc(25,-5,15,0,7);ctx.fill();
-   }
-   if(o.type==='door'){ctx.fillStyle='#5b745e';ctx.fillRect(-70,-150,140,180);ctx.fillStyle='#e7ece8';ctx.fillRect(-53,-135,106,95);ctx.fillStyle='#2f4e38';ctx.fillRect(35,-55,10,10)}
-   ctx.fillStyle='#292630';ctx.font='700 15px system-ui';ctx.textAlign='center';ctx.fillText(o.label,0,-170);
-   ctx.restore();
+ sideRooms.forEach(rm=>{
+   const p=project(rm.z,rm.x);if(!p||p.dz>1550)return;
+   ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
+   ctx.fillStyle='#8b847b';ctx.fillRect(-70,-170,140,170);
+   ctx.fillStyle='#f4f4f2';ctx.fillRect(-55,-150,110,135);
+   ctx.fillStyle='#2f3135';ctx.font='700 14px system-ui';ctx.textAlign='center';ctx.fillText(rm.label,0,-185);
+   ctx.restore()
  });
 }
-function drawNPC(){
- if(G.done)return;
- let station=G.stage<=2?stations.find(s=>s.id==='client'):null;
- if(!station)return;
- let p=project(station.z,station.lane);if(p.dz<0||p.dz>1200)return;
+function drawFurniture(){
+ const scene=[
+  {z:420,x:0,type:'desk',label:'RECEPTION'},
+  {z:780,x:-180,type:'computer',label:'CHART'},
+  {z:1080,x:170,type:'chair',label:'WAITING'},
+  {z:1550,x:-260,type:'mat',label:'NEURO'},
+  {z:1550,x:0,type:'swing',label:'PEDS'},
+  {z:1550,x:260,type:'table',label:'HAND'},
+  {z:2050,x:0,type:'computer',label:'DOCUMENT'},
+  {z:2500,x:0,type:'exit',label:'EXIT'}
+ ];
+ scene.forEach(o=>{
+  let p=project(o.z,o.x);if(!p||p.dz>1550)return;
+  ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
+  if(o.type==='desk'){
+   ctx.fillStyle='#8e6548';ctx.fillRect(-110,-55,220,74);ctx.fillStyle='#c99d77';ctx.fillRect(-100,-47,200,18);
+   ctx.fillStyle='#3c4349';ctx.fillRect(-32,-92,64,38);ctx.fillStyle='#c4dae8';ctx.fillRect(-25,-85,50,25);
+   ctx.fillStyle='#6d4b35';ctx.fillRect(-105,19,18,55);ctx.fillRect(87,19,18,55);
+  }
+  if(o.type==='computer'){
+   ctx.fillStyle='#4e555f';ctx.fillRect(-55,-65,110,78);ctx.fillStyle='#bdd5e6';ctx.fillRect(-45,-55,90,54);
+   ctx.fillStyle='#444';ctx.fillRect(-8,13,16,28);ctx.fillRect(-28,38,56,7);
+  }
+  if(o.type==='chair'){
+   ctx.fillStyle='#6d7d90';ctx.fillRect(-45,-45,90,60);ctx.fillRect(-50,15,12,55);ctx.fillRect(38,15,12,55);ctx.fillRect(-52,-105,104,65);
+  }
+  if(o.type==='mat'){
+   ctx.fillStyle='#6f9ea5';ctx.fillRect(-115,-48,230,78);ctx.fillStyle='#c8e0e1';ctx.fillRect(-102,-38,204,55);
+   ctx.fillStyle='#737373';ctx.fillRect(-95,30,10,55);ctx.fillRect(85,30,10,55);
+  }
+  if(o.type==='swing'){
+   ctx.strokeStyle='#565d66';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-55,-150);ctx.lineTo(-25,-50);ctx.moveTo(55,-150);ctx.lineTo(25,-50);ctx.stroke();
+   ctx.fillStyle='#efc65a';ctx.beginPath();ctx.ellipse(0,-28,74,32,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#74a6bd';ctx.fillRect(-100,12,200,30);
+  }
+  if(o.type==='table'){
+   ctx.fillStyle='#bdcee5';ctx.fillRect(-100,-58,200,88);ctx.fillStyle='#6c7f9a';ctx.fillRect(-84,-45,168,50);
+   ctx.fillStyle='#777';ctx.fillRect(-78,30,12,58);ctx.fillRect(66,30,12,58);
+  }
+  if(o.type==='exit'){ctx.fillStyle='#5b745e';ctx.fillRect(-75,-155,150,188);ctx.fillStyle='#e7ece8';ctx.fillRect(-57,-140,114,100);ctx.fillStyle='#2f4e38';ctx.fillRect(38,-55,10,10)}
+  ctx.restore()
+ })
+}
+function drawCurrentClient(){
+ if(G.done||G.stage>2)return;
+ const s=stations.find(x=>x.id==='client'),p=project(s.z,s.x);if(!p||p.dz>1400)return;
  const c=clients[G.appt];
  const look={skin:G.appt===0?'#d1a07d':G.appt===1?'#b77954':'#9f684a',hair:G.appt===0?'#b9b2aa':'#241a17',scrub:G.appt===0?'#a989ad':G.appt===1?'#4e9fb4':'#6f8ed0',pants:'#49535d',style:G.appt===0?'short':G.appt===1?'curly':'short'};
- drawPerson(ctx,p.x,p.y,look,Math.max(.25,p.k*.75),true,0);
+ drawPerson(ctx,p.x,p.y,look,p.s*.8,true,false)
 }
 function drawScene(){
- const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);drawFloor();drawFurniture();drawNPC();
- // Player is intentionally large in foreground, Subway-Surfers-style.
- drawPerson(ctx,r.width/2,r.height*.83,avatar,1.15,false,G.started&&player.moving?1:0);
+ const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);
+ drawEnvironment();drawFurniture();drawCurrentClient();
+ // player low/center, like the reference
+ drawPerson(ctx,r.width/2,r.height*.84,avatar,1.0,false,G.started&&player.moving);
  requestAnimationFrame(drawScene)
 }
 drawScene();
@@ -246,26 +253,21 @@ drawScene();
 function findNear(){
  let best=null,bd=999;
  stations.forEach(s=>{
-   if(['neuro','peds','hand'].includes(s.id)&&s.case!==G.appt)return;
-   let dz=Math.abs(s.z-player.z),laneD=Math.abs(s.lane-player.lane)*180,d=dz+laneD;
-   if(d<bd){bd=d;best=s}
+  if(['neuro','peds','hand'].includes(s.id)&&s.case!==G.appt)return;
+  let d=Math.hypot((s.z-player.z)/1.2,(s.x-player.x));
+  if(d<bd){bd=d;best=s}
  });
- if(best&&bd<155){G.near=best;hintEl.style.display='block';hintEl.textContent='Interact: '+best.label}
+ if(best&&bd<165){G.near=best;hintEl.style.display='block';hintEl.textContent='Interact: '+best.label}
  else{G.near=null;hintEl.style.display='none'}
 }
 function loop(){
  if(G.started&&!document.getElementById('overlay')){
-   player.moving=!!(keys.up||keys.down||keys.left||keys.right);
-   if(keys.up)player.z+=player.speed;
-   if(keys.down)player.z=Math.max(0,player.z-player.speed);
-   if(keys.left&&player.lane>-1){player.lane-=.055;if(player.lane<-.95)player.lane=-1}
-   if(keys.right&&player.lane<1){player.lane+=.055;if(player.lane>.95)player.lane=1}
-   // lane snapping when released
-   if(!keys.left&&!keys.right){
-     let target=Math.round(player.lane);
-     player.lane+=(target-player.lane)*.12;
-   }
-   findNear();
+  player.moving=!!(keys.up||keys.down||keys.left||keys.right);
+  if(keys.up)player.z+=player.speedZ;
+  if(keys.down)player.z=Math.max(0,player.z-player.speedZ);
+  if(keys.left)player.x=Math.max(-330,player.x-player.speedX);
+  if(keys.right)player.x=Math.min(330,player.x+player.speedX);
+  findNear()
  }
  setTimeout(loop,16)
 }
@@ -273,7 +275,7 @@ loop();
 
 function bind(id,key){let e=document.getElementById(id);e.addEventListener('pointerdown',ev=>{ev.preventDefault();keys[key]=1});['pointerup','pointercancel','pointerleave'].forEach(t=>e.addEventListener(t,()=>keys[key]=0))}
 bind('up','up');bind('down','down');bind('left','left');bind('right','right');
-document.getElementById('interact').addEventListener('click',()=>{if(!G.near)return toast('Move closer to the highlighted clinic area.');interact(G.near.id)});
+document.getElementById('interact').onclick=()=>{if(!G.near)return toast('Move closer to the clinic station.');interact(G.near.id)};
 
 function interact(id){
  if(id==='reception')return reception();
@@ -281,13 +283,13 @@ function interact(id){
  if(id==='client')return clientTalk();
  if(['neuro','peds','hand'].includes(id))return treatment();
  if(id==='soap')return soap();
- if(id==='exit')return exitDay();
+ if(id==='exit')return exitDay()
 }
 function reception(){
- if(G.stage===0){G.stage=1;G.min+=5;ui();overlay(`<h2>Reception</h2><p>You clock in. Your first client is <b>${clients[G.appt].name}</b>.</p><div class="note info">Review the chart before starting treatment.</div><button class="btn primary" id="ok">Continue</button>`);document.getElementById('ok').onclick=closeOverlay}
- else if(G.stage===5){if(G.appt<2){G.appt++;G.stage=1;G.min+=10;player.z=370;player.lane=0;ui();overlay(`<h2>Next Appointment</h2><p>${clients[G.appt].name} is ready.</p><button class="btn primary" id="ok">Continue</button>`);document.getElementById('ok').onclick=closeOverlay}else{G.done=true;ui();toast('All clients complete. Head to EXIT.')}}
+ if(G.stage===0){G.stage=1;G.min+=5;ui();overlay(`<h2>Reception</h2><p>You clock in. Your first client is <b>${clients[G.appt].name}</b>.</p><button class="btn primary" id="ok">Continue</button>`);document.getElementById('ok').onclick=closeOverlay}
+ else if(G.stage===5){if(G.appt<2){G.appt++;G.stage=1;G.min+=10;player.z=380;player.x=0;ui();overlay(`<h2>Next Appointment</h2><p>${clients[G.appt].name} is ready.</p><button class="btn primary" id="ok">Continue</button>`);document.getElementById('ok').onclick=closeOverlay}else{G.done=true;ui();toast('All clients complete. Head to EXIT.')}}
 }
-function chart(){if(G.stage!==1)return toast('Not time for chart review yet.');let c=clients[G.appt];G.min+=8;G.progress[G.appt]=10;ui();overlay(`<h2>${c.name} — Chart</h2><p>${c.chart}</p><p><b>Goal:</b> ${c.goal}</p><button class="btn primary" id="doneChart">Finish Chart Review</button>`);document.getElementById('doneChart').onclick=()=>{G.stage=2;G.clin+=5;closeOverlay();ui();toast('Go speak with the client.')}}
+function chart(){if(G.stage!==1)return toast('Not time for chart review yet.');let c=clients[G.appt];G.min+=8;ui();overlay(`<h2>${c.name} — Chart</h2><p>${c.chart}</p><p><b>Goal:</b> ${c.goal}</p><button class="btn primary" id="doneChart">Finish Chart Review</button>`);document.getElementById('doneChart').onclick=()=>{G.stage=2;G.clin+=5;closeOverlay();ui();toast('Go speak with the client.')}}
 function clientTalk(){if(G.stage!==2)return toast('Review the chart first.');let c=clients[G.appt];showChoices(c.name,c.talk,'talk')}
 function treatment(){if(G.stage!==3)return toast('Complete the client interview first.');let c=clients[G.appt];showChoices(c.setting,c.treat,'treat')}
 function showChoices(title,data,type){
@@ -295,29 +297,24 @@ function showChoices(title,data,type){
  document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>answer(type,+b.dataset.i))
 }
 function answer(type,i){
- let c=clients[G.appt],a=c[type][i];G.clin+=a[1]*5;G.progress[G.appt]+=type==='talk'?15:20;closeOverlay();
- if(type==='talk'){G.stage=3;ui();toast('Take the client to '+c.setting+'.');player.z=1080}
- else ethics()
+ let c=clients[G.appt],a=c[type][i];G.clin+=a[1]*5;
+ if(type==='talk'){closeOverlay();G.stage=3;ui();toast('Take the client to '+c.setting+'.');player.z=1120;return}
+ if(type==='treat'){closeOverlay();ethics();return}
+ if(type==='eth'){if(a[1]<3)G.eth-=20;closeOverlay();safety();ui();return}
+ if(type==='safe'){if(a[1]<3)G.safe-=25;G.stage=4;closeOverlay();ui();player.z=1780;player.x=0;toast('Go to Documentation.');return}
 }
 function ethics(){let c=clients[G.appt];showChoices('Ethics Scenario',c.eth,'eth')}
 function safety(){let c=clients[G.appt];showChoices('Safety Event',c.safe,'safe')}
-function answer(type,i){
- let c=clients[G.appt],a=c[type][i];G.clin+=a[1]*5;
- if(type==='talk'){G.progress[G.appt]+=15;closeOverlay();G.stage=3;ui();toast('Take the client to '+c.setting+'.');player.z=1080;return}
- if(type==='treat'){G.progress[G.appt]+=20;closeOverlay();ethics();return}
- if(type==='eth'){if(a[1]<3)G.eth-=20;closeOverlay();safety();ui();return}
- if(type==='safe'){if(a[1]<3)G.safe-=25;G.stage=4;G.progress[G.appt]+=15;closeOverlay();ui();player.z=1660;toast('Go to the documentation computer.');return}
-}
 function soap(){
  if(G.stage!==4)return toast('Complete treatment first.');
  let c=clients[G.appt];overlay(`<h2>SOAP Note — ${c.name}</h2><textarea id="S" placeholder="S — Subjective"></textarea><textarea id="O" placeholder="O — Objective"></textarea><textarea id="A" placeholder="A — Assessment"></textarea><textarea id="P" placeholder="P — Plan"></textarea><button class="btn primary" id="submitNote">Submit Note</button>`);
- document.getElementById('submitNote').onclick=()=>{let vals=['S','O','A','P'].map(id=>document.getElementById(id).value.trim());if(vals.some(v=>v.length<8))return alert('Add a little more detail to each section.');G.progress[G.appt]=100;G.stage=5;career.xp+=30;career.money+=20;save();closeOverlay();ui();player.z=320;toast('Appointment complete. Return to Reception.')}
+ document.getElementById('submitNote').onclick=()=>{let vals=['S','O','A','P'].map(id=>document.getElementById(id).value.trim());if(vals.some(v=>v.length<8))return alert('Add a little more detail to each section.');G.stage=5;career.xp+=30;career.money+=20;save();closeOverlay();ui();player.z=360;player.x=0;toast('Appointment complete. Return to Reception.')}
 }
 function exitDay(){
  if(!G.done)return toast('Finish all appointments first.');
  let final=Math.max(0,Math.min(100,Math.round(65+G.clin/12+(G.eth-100)/4+(G.safe-100)/4)));
  career.xp+=Math.round(final*.6);career.money+=Math.round(final*.25);career.day++;save();
- overlay(`<h1>Day Complete 🎉</h1><h2>${final}%</h2><p>Your customized OT, XP, money, and workday progression are ready for the next shift.</p><button class="btn primary" id="again">Start Next Workday</button>`);
+ overlay(`<h1>Day Complete 🎉</h1><h2>${final}%</h2><p>V7 keeps your career progression for the next shift.</p><button class="btn primary" id="again">Start Next Workday</button>`);
  document.getElementById('again').onclick=()=>location.reload()
 }
 
