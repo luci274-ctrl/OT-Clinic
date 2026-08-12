@@ -3,709 +3,874 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Hopewell OT Clinic Simulator V10</title>
+<title>Hopewell OT Clinic Simulator V11</title>
 <style>
 :root{
-  --ink:#211f25;--muted:#6c6871;--purple:#6f55d9;--purple2:#8c6cec;
-  --panel:rgba(28,28,31,.82);--line:#ded9e5;--cream:#f5f2ed
+  --ink:#f8f7f4; --dark:#1b1c1e; --glass:rgba(24,24,26,.82);
+  --purple:#6f55dc; --purple2:#8b6ef0; --cream:#eee6d9; --wood:#c9a47f;
+  --panel:#f5f3ef; --text:#26242a; --muted:#716b72;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;overflow:hidden;background:#d8d2c7;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+html,body{margin:0;height:100%;overflow:hidden;background:#b8aa99;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 button,select,textarea,input{font:inherit}
+#app{height:100%;display:flex;flex-direction:column;background:#cab8a5}
 #top{
-  height:58px;background:#ffffffeb;border-bottom:1px solid #d7d2da;
-  display:flex;align-items:center;justify-content:space-between;padding:8px 12px;
-  position:relative;z-index:20;backdrop-filter:blur(10px)
+  height:56px;flex:0 0 56px;background:rgba(20,20,22,.92);color:white;
+  display:flex;align-items:center;justify-content:space-between;padding:7px 10px;
+  z-index:30;backdrop-filter:blur(10px)
 }
-#brand{font-weight:950;letter-spacing:-.02em}
-#stats{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.pill{font-size:.69rem;font-weight:850;background:#f4f0fb;border:1px solid #e1dbe9;border-radius:999px;padding:6px 8px}
-#wrap{position:relative;height:calc(100vh - 58px);overflow:hidden;background:#c8c0b3}
-canvas{width:100%;height:100%;display:block;touch-action:none}
-#hudLeft{
- position:absolute;left:12px;top:12px;z-index:8;display:flex;flex-direction:column;gap:8px
+#brand{font-weight:900;font-size:.95rem;letter-spacing:-.02em}
+#miniStats{display:flex;gap:6px;align-items:center;font-size:.71rem}
+.statChip{background:#2a2a2dcc;border:1px solid #ffffff20;padding:6px 8px;border-radius:10px}
+#wrap{position:relative;flex:1;min-height:0;overflow:hidden}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#hudTopLeft{
+  position:absolute;top:12px;left:12px;z-index:10;display:flex;flex-direction:column;gap:8px
 }
-.hudCard{
- background:var(--panel);color:#fff;border:1px solid #ffffff25;border-radius:14px;
- padding:9px 11px;box-shadow:0 8px 24px #0002;backdrop-filter:blur(8px);font-size:12px
+.hud{
+  background:rgba(24,24,26,.83);color:#fff;border:1px solid #ffffff1f;
+  border-radius:13px;padding:8px 10px;box-shadow:0 8px 25px #0002;backdrop-filter:blur(8px)
 }
-#guide{display:flex;align-items:center;gap:9px;min-width:190px}
-#arrowIcon{font-size:25px;color:#ffd540;display:inline-block;transform-origin:center}
-#schedule{
- position:absolute;right:12px;top:12px;z-index:8;background:var(--panel);color:#fff;
- border:1px solid #ffffff25;border-radius:14px;padding:9px 11px;font-size:11px;backdrop-filter:blur(8px)
-}
+#dayHud{display:flex;align-items:center;gap:10px;font-size:.72rem}
+#dayHud .big{font-weight:900;font-size:.86rem}
+#objectiveHud{display:flex;align-items:center;gap:9px;min-width:205px;font-size:.79rem}
+#guideArrow{font-size:24px;color:#ffd23f;display:inline-block;transform-origin:center}
+#ethicsHud{position:absolute;right:12px;top:12px;z-index:10;display:flex;flex-direction:column;gap:7px}
+.metric{background:rgba(24,24,26,.83);color:#fff;border-radius:12px;padding:7px 10px;font-weight:800;font-size:.72rem;backdrop-filter:blur(8px)}
 #toast{
- position:absolute;left:50%;top:92px;transform:translateX(-50%);z-index:10;
- background:#1f1d22eF;color:#fff;padding:9px 12px;border-radius:12px;display:none;
- max-width:82%;text-align:center;font-size:12px
+  position:absolute;z-index:12;left:50%;top:86px;transform:translateX(-50%);
+  background:#19191be8;color:white;border-radius:12px;padding:9px 12px;display:none;
+  max-width:82%;text-align:center;font-size:.78rem;box-shadow:0 8px 22px #0003
 }
 #hint{
- position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:8;
- background:#1f1d22dc;color:#fff;padding:7px 11px;border-radius:999px;font-size:12px;display:none
+  position:absolute;z-index:11;left:50%;bottom:14px;transform:translateX(-50%);
+  background:rgba(24,24,26,.80);color:#fff;border:1px solid #ffffff24;
+  border-radius:999px;padding:7px 11px;font-size:.74rem;display:none;backdrop-filter:blur(5px)
 }
-#controls{position:absolute;inset:0;pointer-events:none;z-index:9}
-#stick{
- position:absolute;left:18px;bottom:22px;width:122px;height:122px;border:2px solid #ffffff99;
- border-radius:50%;background:#ffffff18;pointer-events:auto;backdrop-filter:blur(3px)
+#joystick{
+  position:absolute;z-index:11;left:18px;bottom:24px;width:118px;height:118px;
+  border:2px solid #ffffff8f;border-radius:50%;background:#ffffff12;backdrop-filter:blur(4px)
 }
-#stickKnob{
- position:absolute;left:37px;top:37px;width:44px;height:44px;border-radius:50%;
- background:#ffffffa8;box-shadow:0 3px 12px #0002
+#joyKnob{
+  position:absolute;left:35px;top:35px;width:44px;height:44px;border-radius:50%;
+  background:#ffffff9f;box-shadow:0 4px 14px #0003
 }
 #interact{
- position:absolute;right:18px;bottom:26px;width:92px;height:92px;border-radius:50%;
- border:2px solid #ffffffa8;background:#4a413d80;color:white;font-weight:900;
- pointer-events:auto;backdrop-filter:blur(5px);box-shadow:0 8px 24px #0002
+  position:absolute;z-index:11;right:18px;bottom:28px;width:92px;height:92px;
+  border-radius:50%;border:2px solid #ffffff9b;background:#433c3880;color:#fff;
+  font-weight:900;backdrop-filter:blur(5px);box-shadow:0 9px 24px #0003
 }
 .overlay{
- position:fixed;inset:0;background:#0e0e10b8;display:grid;place-items:center;padding:14px;z-index:40;overflow:auto
+  position:fixed;inset:0;z-index:50;background:#0e0e10bb;display:grid;place-items:center;
+  padding:12px;overflow:auto
 }
 .panel{
- background:#f6f5f3;border-radius:22px;padding:18px;max-width:900px;width:100%;
- max-height:92vh;overflow:auto;box-shadow:0 25px 70px #0005
+  width:min(930px,100%);max-height:92vh;overflow:auto;background:#ecebea;
+  border-radius:20px;box-shadow:0 28px 80px #0006;color:#27252a
 }
-h1,h2,h3,p{margin-top:0}.muted{color:var(--muted);line-height:1.5}.small{font-size:.88rem}
+.panelHead{
+  display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
+  background:#45494f;color:#fff;border-radius:20px 20px 0 0
+}
+.panelBody{padding:14px}
+h1,h2,h3,p{margin-top:0}
+.muted{color:#746f76;line-height:1.5}.small{font-size:.87rem}
 .btn{
- width:100%;padding:12px 13px;margin:6px 0;border:0;border-radius:13px;background:#ebe8ef;
- font-weight:800;text-align:left
+  width:100%;border:0;border-radius:11px;padding:11px 12px;margin:5px 0;
+  background:#dedbe3;color:#2c2931;font-weight:800;text-align:left
 }
-.primary{background:linear-gradient(90deg,var(--purple),var(--purple2));color:white;text-align:center}
-.note{padding:11px 12px;border-radius:13px;margin:9px 0;background:#eaf1fb}
-.creator{display:grid;grid-template-columns:360px 1fr;gap:16px}
-.preview{
- height:500px;border-radius:18px;overflow:hidden;border:1px solid #d5d1d8;
- background:linear-gradient(#bfcbd0 0 30%,#596068 30% 34%,#6f7479 34% 100%);
- display:grid;place-items:center
+.primary{background:linear-gradient(90deg,var(--purple),var(--purple2));color:#fff;text-align:center}
+.secondary{background:#d5d3d5;text-align:center}
+.creatorShell{display:grid;grid-template-columns:360px 1fr;gap:12px}
+.avatarStage{
+  min-height:510px;background:linear-gradient(#909ba3 0 38%,#555b61 38% 100%);
+  border-radius:14px;display:grid;place-items:center;overflow:hidden;position:relative
 }
-.creatorNav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
-.creatorTab{
- border:1px solid #d7d1df;background:#fff;border-radius:12px;padding:10px 8px;font-weight:800;font-size:12px
+.avatarStage:before{
+  content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 28%,#ffffff22,transparent 35%)
 }
-.group{background:#fff;border:1px solid #ded9e5;border-radius:16px;padding:13px;margin-bottom:9px}
-.swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.swatch{width:36px;height:36px;border-radius:50%;border:3px solid transparent}.swatch.selected{border-color:#27232d}
-select{width:100%;padding:10px;border:1px solid #d5cde0;border-radius:12px;background:#fff;margin-top:8px}
-textarea{width:100%;min-height:78px;border:1px solid #ccc;border-radius:11px;padding:9px;margin:4px 0;background:#fff}
-#docGrid{display:grid;grid-template-columns:170px 1fr;gap:12px}
-.clientList{background:#4c4c52;color:#fff;border-radius:14px;padding:10px}
-.clientItem{padding:10px;border-radius:10px;margin:4px 0;background:#5c5c63}.clientItem.active{background:#7257df}
-.docPane{background:#fff;border:1px solid #ddd;border-radius:14px;padding:14px}
+.customControls{display:grid;grid-template-columns:88px 1fr;gap:10px}
+.sideTabs{display:flex;flex-direction:column;gap:8px}
+.sideTab{
+  background:#555a60;color:white;border:0;border-radius:10px;padding:10px 7px;font-size:.72rem;font-weight:800
+}
+.sideTab.active{background:#6e57d9}
+.controlPane{background:#d8d7d6;border-radius:12px;padding:12px}
+.group{background:#efeeed;border-radius:12px;padding:11px;margin-bottom:9px}
+.group b{font-size:.82rem}
+.swatches{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.swatch{width:32px;height:32px;border-radius:50%;border:3px solid transparent}
+.swatch.selected{border-color:#22232a}
+select{width:100%;margin-top:7px;padding:9px;border:1px solid #c7c4ca;border-radius:10px;background:white}
+.docLayout{display:grid;grid-template-columns:160px 1fr;gap:10px}
+.docClients{background:#4b4d52;color:white;border-radius:12px;padding:9px}
+.docItem{padding:10px;border-radius:8px;margin:4px 0;background:#5b5d62;font-size:.8rem}
+.docItem.active{background:#6f55dc}
+.docMain{background:#f8f7f4;border-radius:12px;padding:12px}
+.tabs{display:flex;gap:10px;font-size:.72rem;font-weight:800;color:#77717b;border-bottom:1px solid #ddd;padding-bottom:8px;margin-bottom:9px}
+.tabs span.active{color:#6f55dc;border-bottom:2px solid #6f55dc;padding-bottom:7px}
+textarea{width:100%;min-height:76px;border:1px solid #d1ccd5;border-radius:9px;padding:8px;margin:4px 0;background:white}
 @media(max-width:760px){
- .creator{grid-template-columns:1fr}.preview{height:340px}
- #docGrid{grid-template-columns:1fr}.clientList{display:flex;gap:6px;overflow:auto}
+  .creatorShell{grid-template-columns:1fr}.avatarStage{min-height:330px}
+  .customControls{grid-template-columns:72px 1fr}.docLayout{grid-template-columns:1fr}
+  .docClients{display:flex;gap:6px;overflow:auto}.docItem{min-width:110px}
 }
 </style>
 </head>
 <body>
-<div id="top">
-  <div id="brand">🧠 Hopewell OT Clinic Simulator V10</div>
-  <div id="stats"></div>
-</div>
-
-<div id="wrap">
-  <canvas id="game"></canvas>
-
-  <div id="hudLeft">
-    <div class="hudCard" id="timeHud"></div>
-    <div class="hudCard" id="guide">
-      <span id="arrowIcon">⬆</span>
-      <span id="guideText">Go to reception</span>
-    </div>
+<div id="app">
+  <div id="top">
+    <div id="brand">Hopewell OT Clinic</div>
+    <div id="miniStats"></div>
   </div>
 
-  <div id="schedule"></div>
-  <div id="toast"></div>
-  <div id="hint"></div>
+  <div id="wrap">
+    <canvas id="game"></canvas>
 
-  <div id="controls">
-    <div id="stick"><div id="stickKnob"></div></div>
+    <div id="hudTopLeft">
+      <div class="hud" id="dayHud"></div>
+      <div class="hud" id="objectiveHud"><span id="guideArrow">⬆</span><span id="objectiveText"></span></div>
+    </div>
+
+    <div id="ethicsHud">
+      <div class="metric" id="ethicsMetric"></div>
+      <div class="metric" id="safetyMetric"></div>
+    </div>
+
+    <div id="toast"></div>
+    <div id="hint"></div>
+
+    <div id="joystick"><div id="joyKnob"></div></div>
     <button id="interact">INTERACT</button>
   </div>
 </div>
 
 <script>
 const cv=document.getElementById('game'),ctx=cv.getContext('2d');
-const statsEl=document.getElementById('stats'),timeHud=document.getElementById('timeHud'),scheduleEl=document.getElementById('schedule');
-const guideText=document.getElementById('guideText'),arrowIcon=document.getElementById('arrowIcon');
+const dayHud=document.getElementById('dayHud'),objectiveText=document.getElementById('objectiveText');
+const guideArrow=document.getElementById('guideArrow'),miniStats=document.getElementById('miniStats');
+const ethicsMetric=document.getElementById('ethicsMetric'),safetyMetric=document.getElementById('safetyMetric');
 const toastEl=document.getElementById('toast'),hintEl=document.getElementById('hint');
-const stick=document.getElementById('stick'),knob=document.getElementById('stickKnob');
+const joystick=document.getElementById('joystick'),joyKnob=document.getElementById('joyKnob');
 
-const skinTones=['#f0c8aa','#dfaa84','#c88a65','#a6694d','#7a4b36','#583422'];
-const hairColors=['#171313','#2c1c18','#4b2c21','#70482f','#a86e44','#d8c5a8','#101010'];
-const scrubColors=['#7659d9','#4d98ab','#ca718f','#5e9574','#687fc2','#9b6aba','#2f747b','#33476e'];
+const skinTones=['#f2cbb0','#e2aa82','#c98b66','#aa6f51','#80503a','#5b3825'];
+const hairColors=['#171313','#291b18','#4b2d21','#6f472f','#aa7145','#d9c6a8','#0f0f0f'];
+const scrubColors=['#6f55dc','#4d93a6','#c5708e','#5d9271','#677fc1','#9568b8','#2f7279','#37476e'];
 const hairStyles=['messy bun','sleek bun','long straight','long waves','shoulder curls','low ponytail','high ponytail','box braids','short crop','soft bob'];
 const eyeStyles=['almond','round','hooded'];
 const browStyles=['soft','arched','straight'];
+
 let avatar={
- skin:skinTones[1],hair:hairColors[1],scrub:scrubColors[0],pants:'#3e3e4b',
- style:'low ponytail',eyes:'almond',brows:'soft'
+  skin:skinTones[1],hair:hairColors[1],scrub:scrubColors[0],pants:'#3b3d49',
+  style:'low ponytail',eyes:'almond',brows:'soft'
 };
 
-let career={xp:+localStorage.v10xp||0,money:+localStorage.v10money||0,day:+localStorage.v10day||1};
+let career={xp:+localStorage.v11xp||0,money:+localStorage.v11money||0,day:+localStorage.v11day||1};
 let G={started:false,stage:0,appt:0,eth:100,safe:100,clin:0,min:485,near:null,done:false,area:'hall'};
 const player={x:0,z:0,vx:0,vz:0,moving:false};
 
 const clients=[
- {name:'Maria Sanchez',short:'Maria',setting:'Neuro Gym',goal:'Dress independently and return home',
-  chart:'Right CVA with left hemiparesis. Fall risk. Possible left neglect. Monitor tolerance.',
-  talk:['“My daughter can just dress me.”',['Ask which parts of dressing matter most to her and what she wants to do independently.',3],['Agree and let family complete all dressing.',0]],
-  treat:['Maria misses grooming items on her left.',['Use functional scanning and neglect strategies during grooming.',3],['Ignore the missed items.',0]],
-  eth:['A neighbor asks for a therapy update.',['Do not disclose without appropriate permission.',3],['Give a brief update.',0]],
-  safe:['Maria becomes pale and dizzy.',['Stop, secure her, and follow facility emergency procedure.',3],['Tell her to push through.',0]]},
- {name:'Eli Johnson',short:'Eli',setting:'Peds Gym',goal:'Improve morning self-care',
-  chart:'Autism and sensory processing differences. Toothbrushing and transition concerns.',
-  talk:['“Can I use the swing?”',['Use the swing for regulation, then transition toward self-care.',3],['Force him directly to the table.',0]],
-  treat:['Choose the best intervention.',['Use a visual schedule plus toothbrushing through play.',3],['Remove preferred activities until compliance.',0]],
-  eth:['Parent asks for a guaranteed outcome.',['Explain that progress varies and use measurable goals.',3],['Guarantee success in two weeks.',0]],
-  safe:['Eli begins coughing after mouthing a toy part.',['Follow emergency procedure and obtain appropriate help.',3],['Wait until session ends.',0]]},
- {name:'Jordan Lee',short:'Jordan',setting:'Hand Therapy',goal:'Return to hairstyling',
-  chart:'Distal radius fracture, 8 weeks post-op. Follow surgeon protocol. Work-task limitations.',
-  talk:['“Push my wrist as hard as possible.”',['Explain graded loading and precautions.',3],['Agree because the client requested it.',0]],
-  treat:['Choose the best intervention.',['Use graded salon-task simulation with pacing and ergonomic modification.',3],['Use maximal resistance despite precautions.',0]],
-  eth:['Jordan asks whether to double pain medication.',['Refer medication questions to the prescribing provider.',3],['Recommend doubling medication.',0]],
-  safe:['New severe swelling and color change appear.',['Stop and escalate according to clinic and medical procedures.',3],['Continue strengthening.',0]]}
+  {
+    name:'Maria Sanchez',short:'Maria',setting:'Neuro Gym',
+    goal:'Dress independently and return home',
+    chart:'Right CVA with left hemiparesis. Fall risk. Possible left neglect. Monitor tolerance.',
+    talk:['“My daughter can just dress me.”',
+      ['Ask which parts of dressing matter most to her and what she wants to do independently.',3],
+      ['Agree and let family complete all dressing.',0]],
+    treat:['Maria misses grooming items on her left.',
+      ['Use functional scanning and neglect strategies during grooming.',3],
+      ['Ignore the missed items.',0]],
+    eth:['A neighbor asks for a therapy update.',
+      ['Do not disclose without appropriate permission.',3],
+      ['Give a brief update.',0]],
+    safe:['Maria becomes pale and dizzy.',
+      ['Stop, secure her, and follow facility emergency procedure.',3],
+      ['Tell her to push through.',0]]
+  },
+  {
+    name:'Eli Johnson',short:'Eli',setting:'Peds Gym',
+    goal:'Improve morning self-care',
+    chart:'Autism and sensory processing differences. Toothbrushing and transition concerns.',
+    talk:['“Can I use the swing?”',
+      ['Use the swing for regulation, then transition toward self-care.',3],
+      ['Force him directly to the table.',0]],
+    treat:['Choose the best intervention.',
+      ['Use a visual schedule plus toothbrushing through play.',3],
+      ['Remove preferred activities until compliance.',0]],
+    eth:['Parent asks for a guaranteed outcome.',
+      ['Explain that progress varies and use measurable goals.',3],
+      ['Guarantee success in two weeks.',0]],
+    safe:['Eli begins coughing after mouthing a toy part.',
+      ['Follow emergency procedure and obtain appropriate help.',3],
+      ['Wait until session ends.',0]]
+  },
+  {
+    name:'Jordan Lee',short:'Jordan',setting:'Hand Therapy',
+    goal:'Return to hairstyling',
+    chart:'Distal radius fracture, 8 weeks post-op. Follow surgeon protocol. Work-task limitations.',
+    talk:['“Push my wrist as hard as possible.”',
+      ['Explain graded loading and precautions.',3],
+      ['Agree because the client requested it.',0]],
+    treat:['Choose the best intervention.',
+      ['Use graded salon-task simulation with pacing and ergonomic modification.',3],
+      ['Use maximal resistance despite precautions.',0]],
+    eth:['Jordan asks whether to double pain medication.',
+      ['Refer medication questions to the prescribing provider.',3],
+      ['Recommend doubling medication.',0]],
+    safe:['New severe swelling and color change appear.',
+      ['Stop and escalate according to clinic and medical procedures.',3],
+      ['Continue strengthening.',0]]
+  }
 ];
 
 const stations=[
- {id:'reception',z:430,x:-150,label:'Reception'},
- {id:'chart',z:860,x:-260,label:'Chart Computer'},
- {id:'client',z:1250,x:220,label:'Waiting Client'},
- {id:'neuroDoor',z:1850,x:-360,label:'Neuro Gym',case:0,area:'neuro'},
- {id:'pedsDoor',z:2450,x:360,label:'Peds Gym',case:1,area:'peds'},
- {id:'handDoor',z:3050,x:-360,label:'Hand Therapy',case:2,area:'hand'},
- {id:'soapDoor',z:3500,x:360,label:'Documentation',area:'soap'},
- {id:'exit',z:4150,x:0,label:'Exit'}
+  {id:'reception',z:430,x:-170,label:'Reception'},
+  {id:'chart',z:900,x:-270,label:'Chart Computer'},
+  {id:'client',z:1300,x:230,label:'Waiting Client'},
+  {id:'neuroDoor',z:1900,x:-400,label:'Neuro Gym',case:0,area:'neuro'},
+  {id:'pedsDoor',z:2500,x:400,label:'Peds Gym',case:1,area:'peds'},
+  {id:'handDoor',z:3100,x:-400,label:'Hand Therapy',case:2,area:'hand'},
+  {id:'soapDoor',z:3650,x:400,label:'Documentation',area:'soap'},
+  {id:'exit',z:4300,x:0,label:'Exit'}
 ];
 
 function resize(){
- const r=cv.parentElement.getBoundingClientRect();
- cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;
- ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)
+  const r=cv.parentElement.getBoundingClientRect();
+  cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)
 }
 addEventListener('resize',resize);resize();
 
 function save(){
- localStorage.v10xp=career.xp;localStorage.v10money=career.money;localStorage.v10day=career.day
+  localStorage.v11xp=career.xp;localStorage.v11money=career.money;localStorage.v11day=career.day
 }
 function clockText(){
- let h=Math.floor(G.min/60),m=G.min%60,ap=h>=12?'PM':'AM';
- return `${h%12||12}:${String(m).padStart(2,'0')} ${ap}`
+  let h=Math.floor(G.min/60),m=G.min%60,ap=h>=12?'PM':'AM';
+  return `${h%12||12}:${String(m).padStart(2,'0')} ${ap}`
 }
-function stats(){
- statsEl.innerHTML=`<span class="pill">Day ${career.day}</span><span class="pill">XP ${career.xp}</span><span class="pill">$${career.money}</span><span class="pill">Ethics ${G.eth}</span><span class="pill">Safety ${G.safe}</span>`;
- timeHud.innerHTML=`<b>Day ${career.day}</b> &nbsp; ${clockText()}<br>⭐ XP ${career.xp} &nbsp; • &nbsp; $${career.money}`;
- scheduleEl.innerHTML=`<b>Schedule</b><br>${clients.map((c,i)=>(i<G.appt?'✓ ':i===G.appt&&!G.done?'→ ':'• ')+c.short).join('<br>')}`
+function updateHUD(){
+  dayHud.innerHTML=`<span class="big">Day ${career.day}</span> &nbsp; ${clockText()}<br>⭐ XP ${career.xp} &nbsp; &nbsp; $${career.money}`;
+  miniStats.innerHTML=`<span class="statChip">XP ${career.xp}</span><span class="statChip">$${career.money}</span>`;
+  ethicsMetric.textContent=`Ethics ${G.eth}`;
+  safetyMetric.textContent=`Safety ${G.safe}`;
+  updateGuide()
 }
 function toast(t){
- toastEl.textContent=t;toastEl.style.display='block';
- clearTimeout(toast.t);toast.t=setTimeout(()=>toastEl.style.display='none',2200)
+  toastEl.textContent=t;toastEl.style.display='block';
+  clearTimeout(toast.t);toast.t=setTimeout(()=>toastEl.style.display='none',2200)
 }
-function overlay(html){
- let d=document.createElement('div');d.className='overlay';d.id='overlay';
- d.innerHTML='<div class="panel">'+html+'</div>';document.body.appendChild(d)
+function overlay(title,body){
+  let d=document.createElement('div');d.className='overlay';d.id='overlay';
+  d.innerHTML=`<div class="panel"><div class="panelHead"><b>${title}</b><span>●</span></div><div class="panelBody">${body}</div></div>`;
+  document.body.appendChild(d)
 }
 function closeOverlay(){document.getElementById('overlay')?.remove()}
 
 function creator(){
- overlay(`
- <h1>Create Your OT</h1>
- <p class="muted">Build a more realistic clinician avatar. The neck is deliberately visible between the head and scrub collar so hair never reads like facial hair.</p>
- <div class="creator">
-  <div class="preview"><canvas id="previewCanvas" width="360" height="500"></canvas></div>
-  <div>
-    <div class="creatorNav">
-      <button class="creatorTab">Face</button><button class="creatorTab">Hair</button><button class="creatorTab">Outfit</button>
+  overlay('CREATE YOUR OT',`
+  <div class="creatorShell">
+    <div class="avatarStage"><canvas id="previewCanvas" width="360" height="510"></canvas></div>
+    <div class="customControls">
+      <div class="sideTabs">
+        <button class="sideTab active">Face</button>
+        <button class="sideTab">Hair</button>
+        <button class="sideTab">Eyes</button>
+        <button class="sideTab">Brows</button>
+        <button class="sideTab">Outfit</button>
+      </div>
+      <div class="controlPane">
+        <div class="group"><b>Hairstyle</b><select id="hairSelect">${hairStyles.map(s=>`<option ${avatar.style===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="group"><b>Eye Shape</b><select id="eyeSelect">${eyeStyles.map(s=>`<option ${avatar.eyes===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="group"><b>Brows</b><select id="browSelect">${browStyles.map(s=>`<option ${avatar.brows===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="group"><b>Skin Tone</b><div class="swatches">${skinTones.map(c=>`<button class="swatch ${avatar.skin===c?'selected':''}" data-k="skin" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
+        <div class="group"><b>Hair Color</b><div class="swatches">${hairColors.map(c=>`<button class="swatch ${avatar.hair===c?'selected':''}" data-k="hair" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
+        <div class="group"><b>Scrub Color</b><div class="swatches">${scrubColors.map(c=>`<button class="swatch ${avatar.scrub===c?'selected':''}" data-k="scrub" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
+      </div>
     </div>
-    <div class="group"><b>Skin tone</b><div class="swatches">${skinTones.map(c=>`<button class="swatch ${avatar.skin===c?'selected':''}" data-k="skin" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
-    <div class="group"><b>Hair color</b><div class="swatches">${hairColors.map(c=>`<button class="swatch ${avatar.hair===c?'selected':''}" data-k="hair" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
-    <div class="group"><b>Scrub color</b><div class="swatches">${scrubColors.map(c=>`<button class="swatch ${avatar.scrub===c?'selected':''}" data-k="scrub" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
-    <div class="group"><label><b>Hairstyle</b><select id="hairSelect">${hairStyles.map(s=>`<option ${avatar.style===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
-    <div class="group"><label><b>Eye shape</b><select id="eyeSelect">${eyeStyles.map(s=>`<option ${avatar.eyes===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
-    <div class="group"><label><b>Brows</b><select id="browSelect">${browStyles.map(s=>`<option ${avatar.brows===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
   </div>
- </div>
- <div class="note"><b>V10 visual goal:</b> premium mobile-game feel — warmer lighting, believable hall proportions, real clinic furniture, wall art, plants, treatment rooms, and a third-person camera.</div>
- <button class="btn primary" id="startBtn">Continue to Clinic</button>`);
- document.querySelectorAll('.swatch').forEach(b=>b.onclick=()=>{avatar[b.dataset.k]=b.dataset.v;closeOverlay();creator()});
- hairSelect.onchange=e=>{avatar.style=e.target.value;drawPreview()};
- eyeSelect.onchange=e=>{avatar.eyes=e.target.value;drawPreview()};
- browSelect.onchange=e=>{avatar.brows=e.target.value;drawPreview()};
- startBtn.onclick=()=>{closeOverlay();G.started=true;stats();updateGuide();toast('Follow the yellow arrow.')};
- setTimeout(drawPreview,20)
+  <button class="btn primary" id="continueBtn">CONTINUE</button>`);
+
+  document.querySelectorAll('.swatch').forEach(b=>b.onclick=()=>{avatar[b.dataset.k]=b.dataset.v;closeOverlay();creator()});
+  document.getElementById('hairSelect').onchange=e=>{avatar.style=e.target.value;drawPreview()};
+  document.getElementById('eyeSelect').onchange=e=>{avatar.eyes=e.target.value;drawPreview()};
+  document.getElementById('browSelect').onchange=e=>{avatar.brows=e.target.value;drawPreview()};
+  document.getElementById('continueBtn').onclick=()=>{closeOverlay();G.started=true;updateHUD();toast('Follow the yellow arrow.')};
+  setTimeout(drawPreview,20)
 }
 
 function drawPreview(){
- let p=document.getElementById('previewCanvas');if(!p)return;
- let c=p.getContext('2d');c.clearRect(0,0,p.width,p.height);
- // blurred-studio feel
- let g=c.createLinearGradient(0,0,0,p.height);g.addColorStop(0,'#9fa9af');g.addColorStop(1,'#454a50');c.fillStyle=g;c.fillRect(0,0,p.width,p.height);
- c.fillStyle='#ffffff18';c.beginPath();c.arc(70,80,60,0,7);c.fill();
- drawPerson(c,180,350,avatar,2.65,true,false,true)
+  let p=document.getElementById('previewCanvas');if(!p)return;
+  let c=p.getContext('2d');c.clearRect(0,0,p.width,p.height);
+  let g=c.createLinearGradient(0,0,0,p.height);g.addColorStop(0,'#7f8991');g.addColorStop(1,'#454a50');
+  c.fillStyle=g;c.fillRect(0,0,p.width,p.height);
+  c.fillStyle='#ffffff1b';c.beginPath();c.arc(75,80,65,0,Math.PI*2);c.fill();
+  drawPerson(c,180,360,avatar,2.65,true,false,true)
 }
 
 function drawFace(c,a,s){
- // eyes
- c.fillStyle='#292126';
- if(a.eyes==='round'){
-   c.beginPath();c.arc(-8*s,-60*s,2.7*s,0,7);c.arc(8*s,-60*s,2.7*s,0,7);c.fill()
- }else if(a.eyes==='hooded'){
-   c.strokeStyle='#292126';c.lineWidth=1.5*s;
-   c.beginPath();c.moveTo(-12*s,-61*s);c.quadraticCurveTo(-8*s,-64*s,-4*s,-61*s);c.stroke();
-   c.beginPath();c.moveTo(4*s,-61*s);c.quadraticCurveTo(8*s,-64*s,12*s,-61*s);c.stroke()
- }else{
-   c.beginPath();c.ellipse(-8*s,-60*s,3.4*s,1.8*s,0,0,7);c.ellipse(8*s,-60*s,3.4*s,1.8*s,0,0,7);c.fill()
- }
- // brows
- c.strokeStyle=a.hair;c.lineWidth=1.4*s;
- if(a.brows==='arched'){
-   c.beginPath();c.arc(-8*s,-67*s,6*s,3.45,5.8);c.stroke();c.beginPath();c.arc(8*s,-67*s,6*s,3.6,5.95);c.stroke()
- }else if(a.brows==='straight'){
-   c.beginPath();c.moveTo(-13*s,-67*s);c.lineTo(-4*s,-67*s);c.stroke();c.beginPath();c.moveTo(4*s,-67*s);c.lineTo(13*s,-67*s);c.stroke()
- }else{
-   c.beginPath();c.moveTo(-13*s,-67*s);c.quadraticCurveTo(-8*s,-70*s,-3*s,-67*s);c.stroke();
-   c.beginPath();c.moveTo(3*s,-67*s);c.quadraticCurveTo(8*s,-70*s,13*s,-67*s);c.stroke()
- }
- // nose
- c.strokeStyle='#8d6559';c.lineWidth=1.2*s;c.beginPath();c.moveTo(0,-59*s);c.lineTo(-1*s,-52*s);c.quadraticCurveTo(1*s,-50*s,3*s,-52*s);c.stroke();
- // mouth/lips
- c.strokeStyle='#985869';c.lineWidth=1.7*s;c.beginPath();c.arc(0,-45*s,7*s,.18,Math.PI-.18);c.stroke()
+  c.fillStyle='#2e2629';
+  if(a.eyes==='round'){
+    c.beginPath();c.arc(-8*s,-60*s,2.8*s,0,7);c.arc(8*s,-60*s,2.8*s,0,7);c.fill()
+  } else if(a.eyes==='hooded'){
+    c.strokeStyle='#2e2629';c.lineWidth=1.6*s;
+    c.beginPath();c.moveTo(-12*s,-61*s);c.quadraticCurveTo(-8*s,-64*s,-4*s,-61*s);c.stroke();
+    c.beginPath();c.moveTo(4*s,-61*s);c.quadraticCurveTo(8*s,-64*s,12*s,-61*s);c.stroke()
+  } else {
+    c.beginPath();c.ellipse(-8*s,-60*s,3.5*s,1.8*s,0,0,7);c.ellipse(8*s,-60*s,3.5*s,1.8*s,0,0,7);c.fill()
+  }
+
+  c.strokeStyle=a.hair;c.lineWidth=1.5*s;
+  if(a.brows==='arched'){
+    c.beginPath();c.arc(-8*s,-67*s,6*s,3.4,5.9);c.stroke();c.beginPath();c.arc(8*s,-67*s,6*s,3.55,6.0);c.stroke()
+  }else if(a.brows==='straight'){
+    c.beginPath();c.moveTo(-13*s,-67*s);c.lineTo(-4*s,-67*s);c.stroke();
+    c.beginPath();c.moveTo(4*s,-67*s);c.lineTo(13*s,-67*s);c.stroke()
+  }else{
+    c.beginPath();c.moveTo(-13*s,-67*s);c.quadraticCurveTo(-8*s,-70*s,-3*s,-67*s);c.stroke();
+    c.beginPath();c.moveTo(3*s,-67*s);c.quadraticCurveTo(8*s,-70*s,13*s,-67*s);c.stroke()
+  }
+
+  c.strokeStyle='#8c665d';c.lineWidth=1.2*s;
+  c.beginPath();c.moveTo(0,-59*s);c.lineTo(-1*s,-52*s);c.quadraticCurveTo(1*s,-50*s,3*s,-52*s);c.stroke();
+
+  c.strokeStyle='#985a69';c.lineWidth=1.7*s;
+  c.beginPath();c.arc(0,-45*s,7*s,.18,Math.PI-.18);c.stroke()
 }
 
 function drawHair(c,a,s){
- c.fillStyle=a.hair;
- const st=a.style;
- if(st==='short crop'){c.beginPath();c.arc(0,-73*s,23*s,Math.PI,Math.PI*2);c.fill()}
- if(st==='messy bun'){
-   c.beginPath();c.arc(0,-72*s,23*s,Math.PI,Math.PI*2);c.fill();
-   c.beginPath();c.arc(0,-92*s,11*s,0,7);c.fill();
-   c.beginPath();c.arc(-8*s,-89*s,6*s,0,7);c.fill();c.beginPath();c.arc(7*s,-94*s,6*s,0,7);c.fill()
- }
- if(st==='sleek bun'){
-   c.beginPath();c.arc(0,-72*s,23*s,Math.PI,Math.PI*2);c.fill();
-   c.beginPath();c.arc(0,-92*s,10*s,0,7);c.fill()
- }
- if(st==='soft bob'){
-   c.fillRect(-23*s,-76*s,46*s,43*s);
-   c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-60*s,20*s,25*s,0,0,7);c.fill();
-   c.fillStyle=a.hair;c.beginPath();c.arc(0,-74*s,23*s,Math.PI,Math.PI*2);c.fill()
- }
- if(st==='long straight'){
-   c.fillRect(-24*s,-77*s,48*s,72*s);
-   c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-60*s,20*s,25*s,0,0,7);c.fill();
-   c.fillStyle=a.hair;c.beginPath();c.arc(0,-74*s,23*s,Math.PI,Math.PI*2);c.fill()
- }
- if(st==='long waves'){
-   c.fillRect(-24*s,-76*s,48*s,69*s);
-   for(let yy=-68;yy<-18;yy+=12){c.beginPath();c.arc(-24*s,yy*s,6*s,0,7);c.arc(24*s,(yy+6)*s,6*s,0,7);c.fill()}
-   c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-60*s,20*s,25*s,0,0,7);c.fill();
-   c.fillStyle=a.hair;c.beginPath();c.arc(0,-74*s,23*s,Math.PI,Math.PI*2);c.fill()
- }
- if(st==='shoulder curls'){
-   for(let xx=-22;xx<=22;xx+=11){for(let yy=-80;yy<=-22;yy+=11){c.beginPath();c.arc(xx*s,yy*s,7*s,0,7);c.fill()}}
-   c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-60*s,19*s,24*s,0,0,7);c.fill()
- }
- if(st==='low ponytail'){
-   c.beginPath();c.arc(0,-73*s,23*s,Math.PI,Math.PI*2);c.fill();
-   c.beginPath();c.ellipse(20*s,-34*s,10*s,30*s,-.12,0,7);c.fill()
- }
- if(st==='high ponytail'){
-   c.beginPath();c.arc(0,-73*s,23*s,Math.PI,Math.PI*2);c.fill();
-   c.beginPath();c.ellipse(18*s,-75*s,10*s,34*s,-.3,0,7);c.fill()
- }
- if(st==='box braids'){
-   c.beginPath();c.arc(0,-73*s,23*s,Math.PI,Math.PI*2);c.fill();
-   for(let xx of [-21,-13,-5,3,11,19])c.fillRect(xx*s,-65*s,4*s,58*s)
- }
+  c.fillStyle=a.hair;
+  const st=a.style;
+  if(st==='short crop'){c.beginPath();c.arc(0,-73*s,23*s,Math.PI,Math.PI*2);c.fill()}
+  if(st==='messy bun'){
+    c.beginPath();c.arc(0,-72*s,23*s,Math.PI,Math.PI*2);c.fill();
+    c.beginPath();c.arc(0,-92*s,11*s,0,7);c.fill();
+    c.beginPath();c.arc(-8*s,-89*s,6*s,0,7);c.fill();c.beginPath();c.arc(7*s,-94*s,6*s,0,7);c.fill()
+  }
+  if(st==='sleek bun'){c.beginPath();c.arc(0,-72*s,23*s,Math.PI,Math.PI*2);c.fill();c.beginPath();c.arc(0,-92*s,10*s,0,7);c.fill()}
+  if(st==='soft bob'){
+    c.fillRect(-23*s,-76*s,46*s,43*s);
+    c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-60*s,20*s,25*s,0,0,7);c.fill();
+    c.fillStyle=a.hair;c.beginPath();c.arc(0,-74*s,23*s,Math.PI,Math.PI*2);c.fill()
+  }
+  if(st==='long straight'){
+    c.fillRect(-24*s,-77*s,48*s,72*s);
+    c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-60*s,20*s,25*s,0,0,7);c.fill();
+    c.fillStyle=a.hair;c.beginPath();c.arc(0,-74*s,23*s,Math.PI,Math.PI*2);c.fill()
+  }
+  if(st==='long waves'){
+    c.fillRect(-24*s,-76*s,48*s,69*s);
+    for(let yy=-68;yy<-18;yy+=12){c.beginPath();c.arc(-24*s,yy*s,6*s,0,7);c.arc(24*s,(yy+6)*s,6*s,0,7);c.fill()}
+    c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-60*s,20*s,25*s,0,0,7);c.fill();
+    c.fillStyle=a.hair;c.beginPath();c.arc(0,-74*s,23*s,Math.PI,Math.PI*2);c.fill()
+  }
+  if(st==='shoulder curls'){
+    for(let xx=-22;xx<=22;xx+=11){for(let yy=-80;yy<=-22;yy+=11){c.beginPath();c.arc(xx*s,yy*s,7*s,0,7);c.fill()}}
+    c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-60*s,19*s,24*s,0,0,7);c.fill()
+  }
+  if(st==='low ponytail'){
+    c.beginPath();c.arc(0,-73*s,23*s,Math.PI,Math.PI*2);c.fill();
+    c.beginPath();c.ellipse(19*s,-31*s,10*s,32*s,-.10,0,7);c.fill()
+  }
+  if(st==='high ponytail'){
+    c.beginPath();c.arc(0,-73*s,23*s,Math.PI,Math.PI*2);c.fill();
+    c.beginPath();c.ellipse(18*s,-75*s,10*s,34*s,-.3,0,7);c.fill()
+  }
+  if(st==='box braids'){
+    c.beginPath();c.arc(0,-73*s,23*s,Math.PI,Math.PI*2);c.fill();
+    for(let xx of [-21,-13,-5,3,11,19])c.fillRect(xx*s,-65*s,4*s,58*s)
+  }
 }
 
 function drawPerson(c,x,y,a,s=1,front=false,moving=false,premium=false){
- c.save();c.translate(x,y);
- const step=moving?Math.sin(Date.now()/95)*7:0;
+  c.save();c.translate(x,y);
+  const step=moving?Math.sin(Date.now()/95)*7:0;
 
- // soft shadow
- c.fillStyle='#0000002d';c.beginPath();c.ellipse(0,53*s,31*s,9*s,0,0,7);c.fill();
+  c.fillStyle='#0000002c';c.beginPath();c.ellipse(0,53*s,31*s,9*s,0,0,7);c.fill();
 
- // legs
- c.fillStyle=a.pants||'#3e4148';
- c.beginPath();c.roundRect(-17*s,18*s+step,13*s,41*s,5*s);c.fill();
- c.beginPath();c.roundRect(4*s,18*s-step,13*s,41*s,5*s);c.fill();
+  c.fillStyle=a.pants||'#3e4148';
+  c.beginPath();c.roundRect(-17*s,18*s+step,13*s,41*s,5*s);c.fill();
+  c.beginPath();c.roundRect(4*s,18*s-step,13*s,41*s,5*s);c.fill();
 
- // shoes
- c.fillStyle='#24272a';c.beginPath();c.roundRect(-21*s,54*s+step,20*s,8*s,3*s);c.fill();
- c.beginPath();c.roundRect(1*s,54*s-step,20*s,8*s,3*s);c.fill();
+  c.fillStyle='#24272a';
+  c.beginPath();c.roundRect(-21*s,54*s+step,20*s,8*s,3*s);c.fill();
+  c.beginPath();c.roundRect(1*s,54*s-step,20*s,8*s,3*s);c.fill();
 
- // torso
- c.fillStyle=a.scrub;
- c.beginPath();c.moveTo(-30*s,-21*s);c.quadraticCurveTo(0,-31*s,30*s,-21*s);c.lineTo(24*s,29*s);c.lineTo(-24*s,29*s);c.closePath();c.fill();
+  c.fillStyle=a.scrub;
+  c.beginPath();c.moveTo(-30*s,-21*s);c.quadraticCurveTo(0,-31*s,30*s,-21*s);c.lineTo(24*s,29*s);c.lineTo(-24*s,29*s);c.closePath();c.fill();
 
- // v-neck inset
- c.fillStyle='#ffffff3d';c.beginPath();c.moveTo(-9*s,-23*s);c.lineTo(0,-12*s);c.lineTo(9*s,-23*s);c.closePath();c.fill();
+  c.fillStyle='#ffffff3a';c.beginPath();c.moveTo(-9*s,-23*s);c.lineTo(0,-12*s);c.lineTo(9*s,-23*s);c.closePath();c.fill();
 
- // arms
- c.fillStyle=a.skin;c.beginPath();c.roundRect(-38*s,-14*s,11*s,45*s,6*s);c.fill();c.beginPath();c.roundRect(27*s,-14*s,11*s,45*s,6*s);c.fill();
+  c.fillStyle=a.skin;
+  c.beginPath();c.roundRect(-38*s,-14*s,11*s,45*s,6*s);c.fill();
+  c.beginPath();c.roundRect(27*s,-14*s,11*s,45*s,6*s);c.fill();
 
- // *** neck kept clearly visible ***
- c.fillStyle=a.skin;
- c.beginPath();c.roundRect(-8*s,-39*s,16*s,18*s,5*s);c.fill();
+  // visible neck — intentionally separate from hair
+  c.beginPath();c.roundRect(-8*s,-39*s,16*s,18*s,5*s);c.fill();
 
- // head
- c.beginPath();c.ellipse(0,-62*s,23*s,29*s,0,0,7);c.fill();
+  c.beginPath();c.ellipse(0,-62*s,23*s,29*s,0,0,7);c.fill();
+  c.beginPath();c.arc(-23*s,-61*s,3.5*s,0,7);c.arc(23*s,-61*s,3.5*s,0,7);c.fill();
 
- // ears
- c.beginPath();c.arc(-23*s,-61*s,3.5*s,0,7);c.arc(23*s,-61*s,3.5*s,0,7);c.fill();
+  drawHair(c,a,s);
+  if(front)drawFace(c,a,s);
 
- drawHair(c,a,s);
- if(front)drawFace(c,a,s);
+  c.fillStyle='#fff';c.beginPath();c.roundRect(10*s,-9*s,11*s,15*s,2*s);c.fill();
+  c.fillStyle='#8093a3';c.fillRect(12*s,-6*s,7*s,3*s);
 
- // badge
- c.fillStyle='#fff';c.beginPath();c.roundRect(10*s,-9*s,11*s,15*s,2*s);c.fill();
- c.fillStyle='#8093a3';c.fillRect(12*s,-6*s,7*s,3*s);
-
- if(premium){
-   c.strokeStyle='#ffffff22';c.lineWidth=1*s;c.beginPath();c.ellipse(0,-62*s,23*s,29*s,0,0,7);c.stroke()
- }
- c.restore()
+  if(premium){c.strokeStyle='#ffffff20';c.lineWidth=1*s;c.beginPath();c.ellipse(0,-62*s,23*s,29*s,0,0,7);c.stroke()}
+  c.restore()
 }
 
-// Perspective world
 function project(z,x){
- const r=cv.getBoundingClientRect(),dz=z-player.z;if(dz<-140)return null;
- const horizon=r.height*.18,bottom=r.height*.87,t=Math.max(0,Math.min(1,dz/1800));
- const y=bottom-(bottom-horizon)*Math.pow(t,.72);
- const corridorW=r.width*(.95-.70*t);
- const px=r.width/2+(x-player.x)*(corridorW/850);
- const s=Math.max(.14,1.48*(1-t)+.15);
- return{x:px,y,s,dz,t,corridorW}
+  const r=cv.getBoundingClientRect(),dz=z-player.z;if(dz<-140)return null;
+  const horizon=r.height*.18,bottom=r.height*.87,t=Math.max(0,Math.min(1,dz/1850));
+  const y=bottom-(bottom-horizon)*Math.pow(t,.72);
+  const corridorW=r.width*(.94-.69*t);
+  const px=r.width/2+(x-player.x)*(corridorW/880);
+  const s=Math.max(.14,1.47*(1-t)+.15);
+  return{x:px,y,s,dz,t,corridorW}
 }
 
 function drawHall(){
- const r=cv.getBoundingClientRect(),cx=r.width/2,h=r.height*.18,b=r.height;
- // ceiling
- let cg=ctx.createLinearGradient(0,0,0,h);cg.addColorStop(0,'#f5f1ea');cg.addColorStop(1,'#e8e2d9');
- ctx.fillStyle=cg;ctx.fillRect(0,0,r.width,h+30);
+  const r=cv.getBoundingClientRect(),cx=r.width/2,h=r.height*.18,b=r.height;
 
- // side walls
- ctx.fillStyle='#cfc6bb';ctx.beginPath();ctx.moveTo(0,h);ctx.lineTo(r.width*.28,h);ctx.lineTo(cx,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
- ctx.fillStyle='#d7cec3';ctx.beginPath();ctx.moveTo(r.width,h);ctx.lineTo(r.width*.72,h);ctx.lineTo(cx,b);ctx.lineTo(r.width,b);ctx.closePath();ctx.fill();
+  let ceil=ctx.createLinearGradient(0,0,0,h);
+  ceil.addColorStop(0,'#f7f3ed');ceil.addColorStop(1,'#e9e1d7');
+  ctx.fillStyle=ceil;ctx.fillRect(0,0,r.width,h+28);
 
- // wood floor
- let fg=ctx.createLinearGradient(0,h,0,b);fg.addColorStop(0,'#b89f85');fg.addColorStop(1,'#d3b695');
- ctx.fillStyle=fg;ctx.beginPath();ctx.moveTo(r.width*.28,h);ctx.lineTo(r.width*.72,h);ctx.lineTo(r.width,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#cfc5b9';
+  ctx.beginPath();ctx.moveTo(0,h);ctx.lineTo(r.width*.28,h);ctx.lineTo(cx,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
 
- // floor boards
- ctx.strokeStyle='#9f856e';ctx.lineWidth=1;
- for(let i=-5;i<=5;i++){ctx.beginPath();ctx.moveTo(cx+i*r.width*.026,h);ctx.lineTo(cx+i*r.width*.13,b);ctx.stroke()}
- for(let i=1;i<17;i++){let yy=h+(b-h)*Math.pow(i/17,1.6);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(r.width,yy);ctx.stroke()}
+  ctx.fillStyle='#d7cec2';
+  ctx.beginPath();ctx.moveTo(r.width,h);ctx.lineTo(r.width*.72,h);ctx.lineTo(cx,b);ctx.lineTo(r.width,b);ctx.closePath();ctx.fill();
 
- // ceiling lights
- for(let i=1;i<9;i++){
-   let yy=h*(i/9),ww=26+55*(i/9);
-   ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(cx,yy,ww,5+4*(i/9),0,0,7);ctx.fill()
- }
+  let floor=ctx.createLinearGradient(0,h,0,b);
+  floor.addColorStop(0,'#a9896d');floor.addColorStop(1,'#d3b18f');
+  ctx.fillStyle=floor;ctx.beginPath();ctx.moveTo(r.width*.28,h);ctx.lineTo(r.width*.72,h);ctx.lineTo(r.width,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
 
- // wall art / plants on both sides
- const decor=[
-  {z:700,x:-410,t:'plant'},{z:1100,x:410,t:'art'},{z:1450,x:-410,t:'chairs'},
-  {z:2150,x:410,t:'art'},{z:2700,x:-410,t:'plant'},{z:3250,x:410,t:'chairs'}
- ];
- decor.forEach(o=>{
-   let p=project(o.z,o.x);if(!p||p.dz>1850)return;
-   ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
-   if(o.t==='plant'){
-     ctx.fillStyle='#8b6b4d';ctx.fillRect(-18,-25,36,25);
-     ctx.fillStyle='#4d7c4d';for(let a=0;a<5;a++){ctx.beginPath();ctx.ellipse((a-2)*9,-45-Math.abs(a-2)*5,15,25,(a-2)*.25,0,7);ctx.fill()}
-   }
-   if(o.t==='art'){ctx.fillStyle='#8a735f';ctx.fillRect(-48,-105,96,80);ctx.fillStyle='#e7e1d7';ctx.fillRect(-40,-97,80,64);ctx.strokeStyle='#9aa78d';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-10,-45);ctx.lineTo(0,-82);ctx.lineTo(14,-55);ctx.stroke()}
-   if(o.t==='chairs'){ctx.fillStyle='#6d655e';for(let q=-1;q<=1;q++){ctx.fillRect(q*52-20,-42,40,42);ctx.fillRect(q*52-22,-80,44,38)}}
-   ctx.restore()
- })
+  ctx.strokeStyle='#9a7d66';ctx.lineWidth=1;
+  for(let i=-6;i<=6;i++){ctx.beginPath();ctx.moveTo(cx+i*r.width*.024,h);ctx.lineTo(cx+i*r.width*.12,b);ctx.stroke()}
+  for(let i=1;i<18;i++){let yy=h+(b-h)*Math.pow(i/18,1.6);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(r.width,yy);ctx.stroke()}
 
- // clinic logo near reception wall
- if(player.z<800){
-   ctx.save();ctx.globalAlpha=.75;ctx.fillStyle='#597167';ctx.font='700 17px system-ui';ctx.fillText('HOPEWELL THERAPY CLINIC',18,r.height*.34);ctx.restore()
- }
+  for(let i=1;i<9;i++){
+    let yy=h*(i/9),ww=24+56*(i/9);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(cx,yy,ww,5+3*(i/9),0,0,7);ctx.fill()
+  }
+
+  // left reception wall
+  if(player.z<850){
+    ctx.save();ctx.globalAlpha=.92;
+    ctx.fillStyle='#50655e';ctx.fillRect(0,r.height*.18,r.width*.28,r.height*.48);
+    ctx.fillStyle='#d8cdbd';ctx.font='700 15px system-ui';ctx.fillText('Hopewell',18,r.height*.33);
+    ctx.font='11px system-ui';ctx.fillText('THERAPY CLINIC',18,r.height*.36);
+    ctx.restore()
+  }
+
+  // realistic hallway decor
+  const decor=[
+    {z:760,x:-430,t:'plant'},{z:980,x:430,t:'art'},{z:1280,x:-430,t:'chairs'},
+    {z:1680,x:430,t:'art'},{z:2100,x:-430,t:'plant'},
+    {z:2700,x:430,t:'chairs'},{z:3300,x:-430,t:'art'}
+  ];
+  decor.forEach(o=>{
+    const p=project(o.z,o.x);if(!p||p.dz>1900)return;
+    ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
+
+    if(o.t==='plant'){
+      ctx.fillStyle='#947257';ctx.beginPath();ctx.roundRect(-18,-24,36,24,4);ctx.fill();
+      ctx.fillStyle='#47744c';
+      for(let k=-2;k<=2;k++){ctx.beginPath();ctx.ellipse(k*9,-45-Math.abs(k)*4,14,23,k*.2,0,7);ctx.fill()}
+    }
+    if(o.t==='art'){
+      ctx.fillStyle='#806c5d';ctx.fillRect(-45,-102,90,78);ctx.fillStyle='#eee7dc';ctx.fillRect(-37,-94,74,62);
+      ctx.strokeStyle='#8fa184';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-7,-45);ctx.lineTo(1,-78);ctx.lineTo(15,-52);ctx.stroke()
+    }
+    if(o.t==='chairs'){
+      ctx.fillStyle='#625b55';
+      for(let q=-1;q<=1;q++){ctx.beginPath();ctx.roundRect(q*50-20,-40,40,40,5);ctx.fill();ctx.beginPath();ctx.roundRect(q*50-22,-78,44,38,6);ctx.fill()}
+    }
+    ctx.restore()
+  })
 }
 
 function drawDoors(){
- const ds=[
-  {z:1850,x:-390,label:'NEURO GYM'},
-  {z:2450,x:390,label:'PEDS GYM'},
-  {z:3050,x:-390,label:'HAND THERAPY'},
-  {z:3500,x:390,label:'DOCUMENTATION'}
- ];
- ds.forEach(d=>{
-  let p=project(d.z,d.x);if(!p||p.dz>1850)return;
-  ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
-  ctx.fillStyle='#9c8f80';ctx.beginPath();ctx.roundRect(-78,-182,156,182,4);ctx.fill();
-  ctx.fillStyle='#6c4932';ctx.beginPath();ctx.roundRect(-63,-160,126,150,4);ctx.fill();
-  ctx.fillStyle='#d6c7b5';ctx.fillRect(-50,-147,100,78);
-  ctx.fillStyle='#262326';ctx.font='700 14px system-ui';ctx.textAlign='center';ctx.fillText(d.label,0,-198);
-  ctx.fillStyle='#b7a997';ctx.beginPath();ctx.arc(45,-68,5,0,7);ctx.fill();ctx.restore()
- })
+  const ds=[
+    {z:1900,x:-400,label:'NEURO'},
+    {z:2500,x:400,label:'PEDS GYM'},
+    {z:3100,x:-400,label:'HAND THERAPY'},
+    {z:3650,x:400,label:'DOCUMENTATION'}
+  ];
+  ds.forEach(d=>{
+    const p=project(d.z,d.x);if(!p||p.dz>1900)return;
+    ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
+
+    ctx.fillStyle='#b9aa98';ctx.beginPath();ctx.roundRect(-78,-184,156,184,4);ctx.fill();
+    ctx.fillStyle='#684a35';ctx.beginPath();ctx.roundRect(-63,-161,126,151,4);ctx.fill();
+    ctx.fillStyle='#d9c9b7';ctx.fillRect(-50,-147,100,78);
+    ctx.fillStyle='#27252a';ctx.font='700 14px system-ui';ctx.textAlign='center';ctx.fillText(d.label,0,-198);
+    ctx.fillStyle='#b7a997';ctx.beginPath();ctx.arc(45,-68,5,0,7);ctx.fill();
+
+    ctx.restore()
+  })
 }
 
 function drawLobby(){
- if(player.z>1450)return;
- const things=[
-  {z:430,x:-150,t:'desk'},
-  {z:860,x:-260,t:'computer'},
-  {z:1250,x:220,t:'chairs'}
- ];
- things.forEach(o=>{
-   let p=project(o.z,o.x);if(!p||p.dz>1500)return;
-   ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
-   if(o.t==='desk'){
-     // curved premium reception
-     ctx.fillStyle='#6f4d36';ctx.beginPath();ctx.roundRect(-135,-65,270,88,18);ctx.fill();
-     ctx.fillStyle='#d7b798';ctx.beginPath();ctx.roundRect(-122,-54,244,20,10);ctx.fill();
-     ctx.fillStyle='#3b4147';ctx.fillRect(-38,-108,76,44);ctx.fillStyle='#bcd4e4';ctx.fillRect(-28,-98,56,29)
-   }
-   if(o.t==='computer'){
-     ctx.fillStyle='#4b535d';ctx.beginPath();ctx.roundRect(-58,-68,116,82,7);ctx.fill();
-     ctx.fillStyle='#bad3e4';ctx.fillRect(-47,-57,94,57);
-     ctx.fillStyle='#42464c';ctx.fillRect(-8,14,16,31);ctx.fillRect(-30,42,60,7)
-   }
-   if(o.t==='chairs'){
-     ctx.fillStyle='#625b56';
-     for(let q=-1;q<=1;q++){ctx.beginPath();ctx.roundRect(q*72-27,-50,54,55,6);ctx.fill();ctx.beginPath();ctx.roundRect(q*72-30,-103,60,54,7);ctx.fill()}
-   }
-   ctx.restore()
- })
+  if(player.z>1450)return;
+  const things=[
+    {z:430,x:-170,t:'desk'},
+    {z:900,x:-270,t:'computer'},
+    {z:1300,x:230,t:'chairs'}
+  ];
+
+  things.forEach(o=>{
+    const p=project(o.z,o.x);if(!p||p.dz>1500)return;
+    ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
+
+    if(o.t==='desk'){
+      ctx.fillStyle='#6f4c35';ctx.beginPath();ctx.roundRect(-138,-68,276,90,20);ctx.fill();
+      ctx.fillStyle='#d2b294';ctx.beginPath();ctx.roundRect(-124,-57,248,20,9);ctx.fill();
+      ctx.fillStyle='#3d4349';ctx.fillRect(-38,-110,76,44);
+      ctx.fillStyle='#bad3e4';ctx.fillRect(-28,-100,56,28);
+    }
+    if(o.t==='computer'){
+      ctx.fillStyle='#4c535d';ctx.beginPath();ctx.roundRect(-58,-69,116,84,7);ctx.fill();
+      ctx.fillStyle='#b9d2e3';ctx.fillRect(-47,-58,94,57);
+      ctx.fillStyle='#41464b';ctx.fillRect(-8,15,16,30);ctx.fillRect(-30,42,60,7);
+    }
+    if(o.t==='chairs'){
+      ctx.fillStyle='#615b55';
+      for(let q=-1;q<=1;q++){
+        ctx.beginPath();ctx.roundRect(q*72-27,-50,54,55,6);ctx.fill();
+        ctx.beginPath();ctx.roundRect(q*72-30,-104,60,54,7);ctx.fill()
+      }
+    }
+    ctx.restore()
+  })
 }
 
 function drawRoom(){
- const r=cv.getBoundingClientRect(),room=G.area;
- let wall='#d7ddd9',floor='#c7aa8b';
- if(room==='peds')wall='#d7e2df';
- if(room==='hand')wall='#d9dddf';
- if(room==='soap')wall='#d9dbde';
+  const r=cv.getBoundingClientRect(),room=G.area;
+  let wall='#d7ddd8',floor='#c8a986';
 
- ctx.fillStyle=wall;ctx.fillRect(0,0,r.width,r.height);
- ctx.fillStyle=floor;ctx.fillRect(0,r.height*.61,r.width,r.height*.39);
+  if(room==='peds')wall='#d9e4e0';
+  if(room==='hand')wall='#d8dcdf';
+  if(room==='soap')wall='#dadddf';
 
- // floor boards
- ctx.strokeStyle='#a58c75';for(let x=0;x<r.width;x+=54){ctx.beginPath();ctx.moveTo(x,r.height*.61);ctx.lineTo(x,r.height);ctx.stroke()}
- for(let y=r.height*.61;y<r.height;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(r.width,y);ctx.stroke()}
+  ctx.fillStyle=wall;ctx.fillRect(0,0,r.width,r.height);
+  ctx.fillStyle=floor;ctx.fillRect(0,r.height*.61,r.width,r.height*.39);
 
- // ceiling lights
- ctx.fillStyle='#fff';for(let x=r.width*.2;x<r.width;x+=r.width*.3)ctx.fillRect(x,18,90,10);
+  ctx.strokeStyle='#a58b73';
+  for(let x=0;x<r.width;x+=55){ctx.beginPath();ctx.moveTo(x,r.height*.61);ctx.lineTo(x,r.height);ctx.stroke()}
+  for(let y=r.height*.61;y<r.height;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(r.width,y);ctx.stroke()}
 
- // framed art
- ctx.fillStyle='#806f60';ctx.fillRect(r.width*.08,r.height*.18,82,102);ctx.fillStyle='#efeae0';ctx.fillRect(r.width*.09,r.height*.19,66,84);
+  ctx.fillStyle='#fff';
+  for(let x=r.width*.18;x<r.width;x+=r.width*.30)ctx.fillRect(x,18,90,10);
 
- if(room==='neuro'){
-   ctx.fillStyle='#52728a';ctx.beginPath();ctx.roundRect(r.width*.68,r.height*.18,85,190,8);ctx.fill();
-   ctx.fillStyle='#52636d';ctx.beginPath();ctx.roundRect(r.width*.15,r.height*.38,r.width*.35,82,12);ctx.fill();
-   ctx.fillStyle='#243039';ctx.fillRect(r.width*.18,r.height*.44,r.width*.29,40);
-   // parallel bars
-   ctx.strokeStyle='#777';ctx.lineWidth=6;
-   ctx.beginPath();ctx.moveTo(r.width*.30,r.height*.67);ctx.lineTo(r.width*.30,r.height*.93);ctx.moveTo(r.width*.63,r.height*.67);ctx.lineTo(r.width*.63,r.height*.93);ctx.stroke();
-   ctx.beginPath();ctx.moveTo(r.width*.27,r.height*.70);ctx.lineTo(r.width*.67,r.height*.70);ctx.moveTo(r.width*.27,r.height*.78);ctx.lineTo(r.width*.67,r.height*.78);ctx.stroke()
- }
- if(room==='peds'){
-   ctx.strokeStyle='#4f5e65';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(r.width*.36,0);ctx.lineTo(r.width*.43,r.height*.29);ctx.moveTo(r.width*.64,0);ctx.lineTo(r.width*.57,r.height*.29);ctx.stroke();
-   ctx.fillStyle='#477aa7';ctx.beginPath();ctx.ellipse(r.width*.50,r.height*.37,54,72,.12,0,7);ctx.fill();
-   ctx.fillStyle='#6ca5c7';ctx.beginPath();ctx.roundRect(r.width*.20,r.height*.60,r.width*.56,36,9);ctx.fill();
-   ctx.fillStyle='#8a755f';ctx.fillRect(r.width*.77,r.height*.40,70,150);ctx.fillStyle='#d8b45d';ctx.beginPath();ctx.arc(r.width*.31,r.height*.53,28,0,7);ctx.fill()
- }
- if(room==='hand'){
-   ctx.fillStyle='#69645f';ctx.beginPath();ctx.roundRect(r.width*.18,r.height*.38,r.width*.58,86,12);ctx.fill();
-   ctx.fillStyle='#b6c5cf';ctx.beginPath();ctx.roundRect(r.width*.23,r.height*.42,r.width*.48,42,10);ctx.fill();
-   ctx.fillStyle='#5c6f80';ctx.fillRect(r.width*.76,r.height*.24,72,190);
-   ctx.fillStyle='#c49b53';ctx.beginPath();ctx.arc(r.width*.36,r.height*.58,18,0,7);ctx.fill();
-   ctx.fillStyle='#a35f75';ctx.beginPath();ctx.arc(r.width*.48,r.height*.58,18,0,7);ctx.fill()
- }
- if(room==='soap'){
-   ctx.fillStyle='#4b4e55';ctx.beginPath();ctx.roundRect(r.width*.36,r.height*.26,r.width*.28,142,8);ctx.fill();
-   ctx.fillStyle='#bdd1e0';ctx.fillRect(r.width*.39,r.height*.30,r.width*.22,86);
-   ctx.fillStyle='#7d5c43';ctx.beginPath();ctx.roundRect(r.width*.17,r.height*.57,r.width*.66,58,8);ctx.fill()
- }
+  // window
+  ctx.fillStyle='#aebbc3';ctx.fillRect(r.width*.68,r.height*.15,r.width*.22,r.height*.28);
+  ctx.fillStyle='#dce5ea';ctx.fillRect(r.width*.70,r.height*.17,r.width*.18,r.height*.24);
 
- // exit room button
- ctx.fillStyle='#262326c9';ctx.beginPath();ctx.roundRect(14,14,128,44,11);ctx.fill();
- ctx.fillStyle='#fff';ctx.font='700 12px system-ui';ctx.fillText('LEAVE ROOM  ↪',29,42)
+  if(room==='neuro'){
+    ctx.fillStyle='#5c6670';ctx.beginPath();ctx.roundRect(r.width*.15,r.height*.38,r.width*.34,85,12);ctx.fill();
+    ctx.fillStyle='#c8d3da';ctx.beginPath();ctx.roundRect(r.width*.19,r.height*.42,r.width*.27,42,10);ctx.fill();
+
+    ctx.strokeStyle='#73777a';ctx.lineWidth=6;
+    ctx.beginPath();ctx.moveTo(r.width*.28,r.height*.69);ctx.lineTo(r.width*.28,r.height*.93);ctx.moveTo(r.width*.65,r.height*.69);ctx.lineTo(r.width*.65,r.height*.93);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(r.width*.24,r.height*.72);ctx.lineTo(r.width*.69,r.height*.72);ctx.moveTo(r.width*.24,r.height*.80);ctx.lineTo(r.width*.69,r.height*.80);ctx.stroke();
+
+    ctx.fillStyle='#566878';ctx.fillRect(r.width*.78,r.height*.28,70,200)
+  }
+
+  if(room==='peds'){
+    ctx.strokeStyle='#4e5d64';ctx.lineWidth=7;
+    ctx.beginPath();ctx.moveTo(r.width*.36,0);ctx.lineTo(r.width*.43,r.height*.29);ctx.moveTo(r.width*.64,0);ctx.lineTo(r.width*.57,r.height*.29);ctx.stroke();
+
+    ctx.fillStyle='#477aa6';ctx.beginPath();ctx.ellipse(r.width*.50,r.height*.37,54,72,.10,0,7);ctx.fill();
+
+    ctx.fillStyle='#6ea5c4';ctx.beginPath();ctx.roundRect(r.width*.20,r.height*.60,r.width*.56,36,9);ctx.fill();
+
+    ctx.fillStyle='#8a745f';ctx.fillRect(r.width*.77,r.height*.40,70,150);
+    ctx.fillStyle='#d6b35d';ctx.beginPath();ctx.arc(r.width*.31,r.height*.53,28,0,7);ctx.fill()
+  }
+
+  if(room==='hand'){
+    ctx.fillStyle='#6d6660';ctx.beginPath();ctx.roundRect(r.width*.18,r.height*.39,r.width*.58,86,12);ctx.fill();
+    ctx.fillStyle='#b9c9d3';ctx.beginPath();ctx.roundRect(r.width*.23,r.height*.43,r.width*.48,42,10);ctx.fill();
+    ctx.fillStyle='#586b7b';ctx.fillRect(r.width*.77,r.height*.24,72,190);
+
+    ctx.fillStyle='#c59953';ctx.beginPath();ctx.arc(r.width*.36,r.height*.58,18,0,7);ctx.fill();
+    ctx.fillStyle='#a45d73';ctx.beginPath();ctx.arc(r.width*.49,r.height*.58,18,0,7);ctx.fill();
+    ctx.fillStyle='#5f8d75';ctx.beginPath();ctx.arc(r.width*.62,r.height*.58,18,0,7);ctx.fill()
+  }
+
+  if(room==='soap'){
+    ctx.fillStyle='#4c4f56';ctx.beginPath();ctx.roundRect(r.width*.36,r.height*.26,r.width*.28,142,8);ctx.fill();
+    ctx.fillStyle='#bed1df';ctx.fillRect(r.width*.39,r.height*.30,r.width*.22,86);
+    ctx.fillStyle='#7e5c43';ctx.beginPath();ctx.roundRect(r.width*.17,r.height*.57,r.width*.66,58,8);ctx.fill()
+  }
+
+  ctx.fillStyle='#2d2b2dcc';ctx.beginPath();ctx.roundRect(14,14,128,44,11);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='700 12px system-ui';ctx.fillText('LEAVE ROOM  ↪',29,42)
 }
 
 function drawCurrentClient(){
- if(G.done||G.stage>2||G.area!=='hall')return;
- const s=stations.find(x=>x.id==='client'),p=project(s.z,s.x);if(!p||p.dz>1650)return;
- const looks=[
-   {skin:'#d5a07b',hair:'#a9a49e',scrub:'#8e6d91',pants:'#4c5359',style:'soft bob',eyes:'round',brows:'soft'},
-   {skin:'#b87852',hair:'#251a17',scrub:'#4d91a6',pants:'#4c5359',style:'shoulder curls',eyes:'round',brows:'soft'},
-   {skin:'#9f694c',hair:'#201713',scrub:'#687fc2',pants:'#4c5359',style:'short crop',eyes:'almond',brows:'straight'}
- ];
- drawPerson(ctx,p.x,p.y,looks[G.appt],p.s*.76,true,false,false)
+  if(G.done||G.stage>2||G.area!=='hall')return;
+  const s=stations.find(x=>x.id==='client'),p=project(s.z,s.x);
+  if(!p||p.dz>1700)return;
+
+  const looks=[
+    {skin:'#d5a07b',hair:'#aaa49e',scrub:'#8c7090',pants:'#4c5359',style:'soft bob',eyes:'round',brows:'soft'},
+    {skin:'#b77751',hair:'#251a17',scrub:'#4c91a5',pants:'#4c5359',style:'shoulder curls',eyes:'round',brows:'soft'},
+    {skin:'#9e684b',hair:'#201713',scrub:'#687fc1',pants:'#4c5359',style:'short crop',eyes:'almond',brows:'straight'}
+  ];
+  drawPerson(ctx,p.x,p.y,looks[G.appt],p.s*.77,true,false,false)
 }
 
 function drawScene(){
- const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);
- if(G.area==='hall'){drawHall();drawDoors();drawLobby();drawCurrentClient()}
- else drawRoom();
+  const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);
 
- // third-person avatar low in frame
- drawPerson(ctx,r.width/2,r.height*.84,avatar,1.02,false,G.started&&player.moving,false);
- requestAnimationFrame(drawScene)
+  if(G.area==='hall'){
+    drawHall();drawDoors();drawLobby();drawCurrentClient()
+  }else{
+    drawRoom()
+  }
+
+  drawPerson(ctx,r.width/2,r.height*.84,avatar,1.02,false,G.started&&player.moving,false);
+  requestAnimationFrame(drawScene)
 }
 drawScene();
 
 function targetStation(){
- if(G.done)return stations.find(s=>s.id==='exit');
- if(G.stage===0)return stations.find(s=>s.id==='reception');
- if(G.stage===1)return stations.find(s=>s.id==='chart');
- if(G.stage===2)return stations.find(s=>s.id==='client');
- if(G.stage===3)return stations.find(s=>s.case===G.appt);
- if(G.stage===4)return stations.find(s=>s.id==='soapDoor');
- return stations.find(s=>s.id==='reception')
+  if(G.done)return stations.find(s=>s.id==='exit');
+  if(G.stage===0)return stations.find(s=>s.id==='reception');
+  if(G.stage===1)return stations.find(s=>s.id==='chart');
+  if(G.stage===2)return stations.find(s=>s.id==='client');
+  if(G.stage===3)return stations.find(s=>s.case===G.appt);
+  if(G.stage===4)return stations.find(s=>s.id==='soapDoor');
+  return stations.find(s=>s.id==='reception')
 }
-function updateGuide(){
- const c=clients[G.appt];
- let txt=G.done?'Exit clinic':G.stage===0?'Clock in at reception':G.stage===1?`Review ${c.short}'s chart`:G.stage===2?`Meet ${c.short}`:G.stage===3?`Enter ${c.setting}`:G.stage===4?'Go to documentation':'Return to reception';
- guideText.textContent=txt;
 
- if(G.area!=='hall'){arrowIcon.style.transform='rotate(180deg)';return}
- const t=targetStation();if(!t)return;
- const dz=t.z-player.z,dx=t.x-player.x;
- let deg=0;
- if(Math.abs(dx)>130&&Math.abs(dx)>Math.abs(dz)*.3)deg=dx>0?90:-90;
- else deg=dz>=0?0:180;
- arrowIcon.style.transform=`rotate(${deg}deg)`
+function updateGuide(){
+  const c=clients[G.appt];
+  objectiveText.textContent=
+    G.done?'Exit clinic':
+    G.stage===0?'Go to reception':
+    G.stage===1?`Review ${c.short}'s chart`:
+    G.stage===2?`Meet ${c.short}`:
+    G.stage===3?`Enter ${c.setting}`:
+    G.stage===4?'Go to documentation':
+    'Return to reception';
+
+  if(G.area!=='hall'){
+    guideArrow.style.transform='rotate(180deg)';
+    return
+  }
+
+  const t=targetStation();if(!t)return;
+  const dz=t.z-player.z,dx=t.x-player.x;
+  let deg=0;
+  if(Math.abs(dx)>130&&Math.abs(dx)>Math.abs(dz)*.30)deg=dx>0?90:-90;
+  else deg=dz>=0?0:180;
+  guideArrow.style.transform=`rotate(${deg}deg)`
 }
 
 function findNear(){
- if(G.area!=='hall'){G.near={id:'back',label:'Leave Room'};hintEl.style.display='block';hintEl.textContent='Interact: Leave Room';return}
- let best=null,bd=999;
- stations.forEach(s=>{
-   if(['neuroDoor','pedsDoor','handDoor'].includes(s.id)&&s.case!==G.appt)return;
-   let d=Math.hypot((s.z-player.z)/1.2,s.x-player.x);
-   if(d<bd){bd=d;best=s}
- });
- if(best&&bd<175){G.near=best;hintEl.style.display='block';hintEl.textContent='Interact: '+best.label}
- else{G.near=null;hintEl.style.display='none'}
+  if(G.area!=='hall'){
+    G.near={id:'back',label:'Leave Room'};
+    hintEl.style.display='block';hintEl.textContent='Interact: Leave Room';return
+  }
+
+  let best=null,bd=999;
+  stations.forEach(s=>{
+    if(['neuroDoor','pedsDoor','handDoor'].includes(s.id)&&s.case!==G.appt)return;
+    const d=Math.hypot((s.z-player.z)/1.2,s.x-player.x);
+    if(d<bd){bd=d;best=s}
+  });
+
+  if(best&&bd<180){
+    G.near=best;hintEl.style.display='block';hintEl.textContent='Interact: '+best.label
+  }else{
+    G.near=null;hintEl.style.display='none'
+  }
 }
 
 function loop(){
- if(G.started&&!document.getElementById('overlay')){
-   player.moving=Math.hypot(player.vx,player.vz)>.2;
-   if(G.area==='hall'){
-     player.x=Math.max(-390,Math.min(390,player.x+player.vx));
-     player.z=Math.max(0,player.z+player.vz)
-   }
-   player.vx*=.85;player.vz*=.85;
-   findNear();updateGuide()
- }
- setTimeout(loop,16)
+  if(G.started&&!document.getElementById('overlay')){
+    player.moving=Math.hypot(player.vx,player.vz)>.2;
+
+    if(G.area==='hall'){
+      player.x=Math.max(-410,Math.min(410,player.x+player.vx));
+      player.z=Math.max(0,player.z+player.vz)
+    }
+
+    player.vx*=.85;player.vz*=.85;
+    findNear();updateGuide()
+  }
+
+  setTimeout(loop,16)
 }
 loop();
 
-// joystick
-let dragging=false;
-function setStick(clientX,clientY){
- const r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
- let dx=clientX-cx,dy=clientY-cy,mag=Math.hypot(dx,dy),max=42;
- if(mag>max){dx=dx/mag*max;dy=dy/mag*max}
- knob.style.transform=`translate(${dx}px,${dy}px)`;
- player.vx=dx/max*5.6;
- player.vz=-dy/max*5.8
-}
-stick.addEventListener('pointerdown',e=>{dragging=true;stick.setPointerCapture(e.pointerId);setStick(e.clientX,e.clientY)});
-stick.addEventListener('pointermove',e=>{if(dragging)setStick(e.clientX,e.clientY)});
-stick.addEventListener('pointerup',()=>{dragging=false;knob.style.transform='translate(0,0)'});
-stick.addEventListener('pointercancel',()=>{dragging=false;knob.style.transform='translate(0,0)'});
+let joyDrag=false;
+function moveJoy(clientX,clientY){
+  const r=joystick.getBoundingClientRect();
+  const cx=r.left+r.width/2,cy=r.top+r.height/2;
+  let dx=clientX-cx,dy=clientY-cy,mag=Math.hypot(dx,dy),max=40;
 
-document.getElementById('interact').onclick=()=>{if(!G.near)return toast('Follow the arrow and move closer.');interact(G.near.id)};
+  if(mag>max){dx=dx/mag*max;dy=dy/mag*max}
+
+  joyKnob.style.transform=`translate(${dx}px,${dy}px)`;
+  player.vx=dx/max*5.8;
+  player.vz=-dy/max*6.0
+}
+joystick.addEventListener('pointerdown',e=>{joyDrag=true;joystick.setPointerCapture(e.pointerId);moveJoy(e.clientX,e.clientY)});
+joystick.addEventListener('pointermove',e=>{if(joyDrag)moveJoy(e.clientX,e.clientY)});
+joystick.addEventListener('pointerup',()=>{joyDrag=false;joyKnob.style.transform='translate(0,0)'});
+joystick.addEventListener('pointercancel',()=>{joyDrag=false;joyKnob.style.transform='translate(0,0)'});
+
+document.getElementById('interact').onclick=()=>{
+  if(!G.near)return toast('Follow the yellow arrow and move closer.');
+  interact(G.near.id)
+};
 
 function interact(id){
- if(id==='back'){G.area='hall';return}
- if(id==='reception')return reception();
- if(id==='chart')return chart();
- if(id==='client')return clientTalk();
- if(['neuroDoor','pedsDoor','handDoor'].includes(id))return enterTreatment(id);
- if(id==='soapDoor')return enterSoap();
- if(id==='exit')return exitDay()
+  if(id==='back'){G.area='hall';return}
+  if(id==='reception')return reception();
+  if(id==='chart')return chart();
+  if(id==='client')return clientTalk();
+  if(['neuroDoor','pedsDoor','handDoor'].includes(id))return enterTreatment(id);
+  if(id==='soapDoor')return enterDocumentation();
+  if(id==='exit')return exitDay()
 }
+
 function reception(){
- if(G.stage===0){
-   G.stage=1;G.min+=5;stats();updateGuide();
-   overlay(`<h2>Reception</h2><p>You clock in for Day ${career.day}. Your first client is <b>${clients[G.appt].name}</b>.</p><div class="note">Review the chart before beginning treatment.</div><button class="btn primary" id="ok">Continue</button>`);
-   ok.onclick=closeOverlay
- }else if(G.stage===5){
-   if(G.appt<2){
-     G.appt++;G.stage=1;G.min+=10;player.z=380;player.x=0;stats();updateGuide();
-     overlay(`<h2>Next Appointment</h2><p>${clients[G.appt].name} is ready.</p><button class="btn primary" id="ok">Continue</button>`);ok.onclick=closeOverlay
-   }else{
-     G.done=true;stats();updateGuide();toast('All clients complete. Follow the arrow to exit.')
-   }
- }
+  if(G.stage===0){
+    G.stage=1;G.min+=5;updateHUD();
+    overlay('RECEPTION',`
+      <p>You clock in for Day ${career.day}. Your first client is <b>${clients[G.appt].name}</b>.</p>
+      <p class="muted small">Review the client chart before beginning treatment.</p>
+      <button class="btn primary" id="okBtn">CONTINUE</button>`);
+    document.getElementById('okBtn').onclick=closeOverlay
+  }else if(G.stage===5){
+    if(G.appt<2){
+      G.appt++;G.stage=1;G.min+=10;player.z=380;player.x=0;updateHUD();
+      overlay('NEXT APPOINTMENT',`
+        <p>${clients[G.appt].name} is ready.</p>
+        <button class="btn primary" id="okBtn">CONTINUE</button>`);
+      document.getElementById('okBtn').onclick=closeOverlay
+    }else{
+      G.done=true;updateHUD();toast('All clients complete. Follow the arrow to exit.')
+    }
+  }
 }
+
 function chart(){
- if(G.stage!==1)return toast('Not time for chart review yet.');
- let c=clients[G.appt];G.min+=8;stats();
- overlay(`<h2>${c.name} — Chart</h2><p>${c.chart}</p><p><b>Client goal:</b> ${c.goal}</p><button class="btn primary" id="doneChart">Finish Chart Review</button>`);
- doneChart.onclick=()=>{G.stage=2;G.clin+=5;closeOverlay();updateGuide()}
+  if(G.stage!==1)return toast('Not time for chart review yet.');
+  let c=clients[G.appt];G.min+=8;updateHUD();
+
+  overlay(`${c.name.toUpperCase()} — CHART`,`
+    <p>${c.chart}</p>
+    <p><b>Client goal:</b> ${c.goal}</p>
+    <button class="btn primary" id="finishChart">FINISH CHART REVIEW</button>`);
+
+  document.getElementById('finishChart').onclick=()=>{
+    G.stage=2;G.clin+=5;closeOverlay();updateGuide()
+  }
 }
+
 function clientTalk(){
- if(G.stage!==2)return toast('Review the chart first.');
- let c=clients[G.appt];showChoices(c.name,c.talk,'talk')
+  if(G.stage!==2)return toast('Review the chart first.');
+  const c=clients[G.appt];showChoices(c.name,c.talk,'talk')
 }
+
 function enterTreatment(id){
- if(G.stage!==3)return toast('Complete the client interview first.');
- G.area=id==='neuroDoor'?'neuro':id==='pedsDoor'?'peds':'hand';
- setTimeout(()=>showChoices(clients[G.appt].setting,clients[G.appt].treat,'treat'),180)
+  if(G.stage!==3)return toast('Complete the client interview first.');
+  G.area=id==='neuroDoor'?'neuro':id==='pedsDoor'?'peds':'hand';
+  setTimeout(()=>showChoices(clients[G.appt].setting,clients[G.appt].treat,'treat'),180)
 }
-function enterSoap(){
- if(G.stage!==4)return toast('Complete treatment first.');
- G.area='soap';setTimeout(showDocumentation,180)
+
+function enterDocumentation(){
+  if(G.stage!==4)return toast('Complete treatment first.');
+  G.area='soap';
+  setTimeout(showDocumentation,180)
 }
+
 function showChoices(title,data,type){
- overlay(`<h2>${title}</h2><p>${data[0]}</p>${data.slice(1).map((a,i)=>`<button class="btn choice" data-i="${i+1}">${a[0]}</button>`).join('')}`);
- document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>answer(type,+b.dataset.i))
+  overlay(title.toUpperCase(),`
+    <p>${data[0]}</p>
+    ${data.slice(1).map((a,i)=>`<button class="btn choice" data-i="${i+1}">${a[0]}</button>`).join('')}`);
+  document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>answer(type,+b.dataset.i))
 }
+
 function answer(type,i){
- let c=clients[G.appt],a=c[type][i];G.clin+=a[1]*5;
- if(type==='talk'){closeOverlay();G.stage=3;player.z=1500;updateGuide();return}
- if(type==='treat'){closeOverlay();ethics();return}
- if(type==='eth'){if(a[1]<3)G.eth-=20;closeOverlay();safety();stats();return}
- if(type==='safe'){if(a[1]<3)G.safe-=25;G.stage=4;closeOverlay();G.area='hall';player.z=3150;player.x=250;stats();updateGuide();return}
+  let c=clients[G.appt],a=c[type][i];G.clin+=a[1]*5;
+
+  if(type==='talk'){
+    closeOverlay();G.stage=3;player.z=1500;updateGuide();return
+  }
+  if(type==='treat'){
+    closeOverlay();ethics();return
+  }
+  if(type==='eth'){
+    if(a[1]<3)G.eth-=20;
+    closeOverlay();safety();updateHUD();return
+  }
+  if(type==='safe'){
+    if(a[1]<3)G.safe-=25;
+    G.stage=4;closeOverlay();G.area='hall';player.z=3300;player.x=250;updateHUD();return
+  }
 }
+
 function ethics(){showChoices('Ethics Scenario',clients[G.appt].eth,'eth')}
 function safety(){showChoices('Safety Event',clients[G.appt].safe,'safe')}
 
 function showDocumentation(){
- let c=clients[G.appt];
- overlay(`<h2>Documentation</h2>
- <div id="docGrid">
-   <div class="clientList">
-     <div class="clientItem active">${c.name}</div>
-     <div class="clientItem">${clients[(G.appt+1)%3].name}</div>
-     <div class="clientItem">${clients[(G.appt+2)%3].name}</div>
-   </div>
-   <div class="docPane">
-     <h3>${c.name}</h3>
-     <p class="muted small">${c.chart}</p>
-     <textarea id="S" placeholder="Subjective"></textarea>
-     <textarea id="O" placeholder="Objective"></textarea>
-     <textarea id="A" placeholder="Assessment"></textarea>
-     <textarea id="P" placeholder="Plan"></textarea>
-     <button class="btn primary" id="submitNote">Save Note</button>
-   </div>
- </div>`);
- submitNote.onclick=()=>{
-   let vals=['S','O','A','P'].map(id=>document.getElementById(id).value.trim());
-   if(vals.some(v=>v.length<8))return alert('Add a little more detail to each section.');
-   G.stage=5;career.xp+=30;career.money+=20;save();closeOverlay();G.area='hall';player.z=360;player.x=0;stats();updateGuide();toast('Appointment complete. Return to reception.')
- }
+  const c=clients[G.appt];
+
+  overlay('DOCUMENTATION',`
+    <div class="docLayout">
+      <div class="docClients">
+        ${clients.map((x,i)=>`<div class="docItem ${i===G.appt?'active':''}">${x.name}</div>`).join('')}
+      </div>
+
+      <div class="docMain">
+        <h3>${c.name}</h3>
+        <div class="tabs"><span class="active">EVALUATION</span><span>GOALS</span><span>NOTES</span><span>PROGRESS</span></div>
+        <p class="muted small">${c.chart}</p>
+
+        <textarea id="S" placeholder="Subjective"></textarea>
+        <textarea id="O" placeholder="Objective"></textarea>
+        <textarea id="A" placeholder="Assessment"></textarea>
+        <textarea id="P" placeholder="Plan"></textarea>
+
+        <button class="btn primary" id="saveNote">EDIT / SAVE NOTE</button>
+      </div>
+    </div>`);
+
+  document.getElementById('saveNote').onclick=()=>{
+    const vals=['S','O','A','P'].map(id=>document.getElementById(id).value.trim());
+    if(vals.some(v=>v.length<8))return alert('Add a little more detail to each section.');
+
+    G.stage=5;career.xp+=30;career.money+=20;save();
+    closeOverlay();G.area='hall';player.z=360;player.x=0;updateHUD();
+    toast('Appointment complete. Return to reception.')
+  }
 }
 
 function exitDay(){
- if(!G.done)return toast('Finish all appointments first.');
- let final=Math.max(0,Math.min(100,Math.round(65+G.clin/12+(G.eth-100)/4+(G.safe-100)/4)));
- career.xp+=Math.round(final*.6);career.money+=Math.round(final*.25);career.day++;save();
- overlay(`<h1>Day Complete</h1><h2>${final}%</h2><p>Your Hopewell clinic career continues with the same XP and money.</p><button class="btn primary" id="again">Start Next Workday</button>`);
- again.onclick=()=>location.reload()
+  if(!G.done)return toast('Finish all appointments first.');
+
+  const final=Math.max(0,Math.min(100,Math.round(65+G.clin/12+(G.eth-100)/4+(G.safe-100)/4)));
+  career.xp+=Math.round(final*.6);career.money+=Math.round(final*.25);career.day++;save();
+
+  overlay('DAY COMPLETE',`
+    <h2>${final}%</h2>
+    <p>Your Hopewell career continues with your XP and clinic earnings.</p>
+    <button class="btn primary" id="again">START NEXT WORKDAY</button>`);
+
+  document.getElementById('again').onclick=()=>location.reload()
 }
 
-stats();updateGuide();creator();
+updateHUD();creator();
 </script>
 </body>
 </html>
