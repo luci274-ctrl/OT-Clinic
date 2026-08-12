@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>OT Clinic Simulator V8</title>
+<title>OT Clinic Simulator V9</title>
 <style>
-:root{--ink:#241f2d;--purple:#7357e8;--purple2:#9c76f2;--line:#ddd6e8}
+:root{--ink:#241f2d;--purple:#7357e8;--purple2:#9c76f2;--line:#ddd6e8;--glass:rgba(255,255,255,.94)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;background:#dfe7ea;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
 button,select,textarea{font:inherit}
-#top{height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:8px 12px;gap:8px;position:relative;z-index:12}
-#brand{font-weight:950;font-size:1.02rem}
+#top{height:58px;background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:8px 12px;gap:8px;position:relative;z-index:12}
+#brand{font-weight:950;font-size:1rem}
 #stats{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.pill{font-size:.69rem;font-weight:850;background:#f4f0fb;border:1px solid #e2dceb;border-radius:999px;padding:6px 8px}
-#wrap{position:relative;height:calc(100vh - 60px);overflow:hidden;background:#bcc9ce}
+.pill{font-size:.68rem;font-weight:850;background:#f4f0fb;border:1px solid #e2dceb;border-radius:999px;padding:6px 8px}
+#wrap{position:relative;height:calc(100vh - 58px);overflow:hidden;background:#c9d4d9}
 canvas{width:100%;height:100%;display:block;touch-action:none}
-#objective,#schedule{position:absolute;top:10px;background:#fff;border:1px solid #ddd;border-radius:13px;padding:8px 10px;font-size:12px;z-index:7;box-shadow:0 4px 14px #0001}
-#objective{left:10px;max-width:215px}#schedule{right:10px;max-width:150px}
+#schedule{position:absolute;right:10px;top:10px;background:var(--glass);border:1px solid #ddd;border-radius:13px;padding:8px 10px;font-size:11px;z-index:7;box-shadow:0 4px 14px #0001}
 #toast{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#292331;color:white;padding:9px 12px;border-radius:12px;display:none;z-index:10;max-width:82%;text-align:center}
+#guideArrow{position:absolute;left:50%;top:82px;transform:translateX(-50%);z-index:8;font-size:46px;line-height:1;color:#7357e8;text-shadow:0 2px 6px #fff,0 4px 12px #0002;transition:transform .15s}
 #hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#fff;padding:7px 10px;border-radius:999px;font-size:12px;display:none;z-index:8}
 #controls{position:absolute;inset:0;pointer-events:none;z-index:8}
 #dpad{position:absolute;left:16px;bottom:18px;width:150px;height:150px;pointer-events:auto}
@@ -25,26 +25,26 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
 #up{left:49px;top:0}#down{left:49px;bottom:0}#left{left:0;top:49px}#right{right:0;top:49px}
 #interact{position:absolute;right:18px;bottom:28px;width:94px;height:94px;border:0;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple2));color:white;font-weight:950;pointer-events:auto;box-shadow:0 9px 23px #6048b955}
 .overlay{position:fixed;inset:0;background:#0009;display:grid;place-items:center;padding:14px;z-index:30;overflow:auto}
-.panel{background:white;border-radius:23px;padding:18px;max-width:830px;width:100%;max-height:92vh;overflow:auto}
+.panel{background:white;border-radius:23px;padding:18px;max-width:840px;width:100%;max-height:92vh;overflow:auto}
 h1,h2,h3,p{margin-top:0}.muted{color:#6f6879;line-height:1.5}.small{font-size:.88rem}
 .btn{width:100%;padding:12px 13px;margin:6px 0;border:0;border-radius:13px;background:#f0ecf8;font-weight:800;text-align:left}
 .primary{background:linear-gradient(90deg,var(--purple),var(--purple2));color:white;text-align:center}
 .note{padding:11px 12px;border-radius:13px;margin:9px 0}.info{background:#edf4ff}
-.creator{display:grid;grid-template-columns:300px 1fr;gap:16px}
-.preview{height:390px;border-radius:19px;background:linear-gradient(#cfe6ef 0 45%,#c6bfb4 45%);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.creator{display:grid;grid-template-columns:310px 1fr;gap:16px}
+.preview{height:410px;border-radius:19px;background:linear-gradient(#d8e9f0 0 42%,#cfc7ba 42%);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
 .group{background:#f8f5fc;border:1px solid var(--line);border-radius:17px;padding:13px;margin-bottom:9px}
 .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .swatch{width:36px;height:36px;border-radius:50%;border:3px solid transparent}.swatch.selected{border-color:#241f2b}
 select{width:100%;padding:10px;border:1px solid #d5cde0;border-radius:12px;background:white;margin-top:8px}
 textarea{width:100%;min-height:75px;border:1px solid #ccc;border-radius:11px;padding:9px;margin:4px 0}
-@media(max-width:700px){.creator{grid-template-columns:1fr}.preview{height:280px}#objective{max-width:180px}}
+@media(max-width:700px){.creator{grid-template-columns:1fr}.preview{height:290px}}
 </style>
 </head>
 <body>
-<div id="top"><div id="brand">🧠 OT Clinic Simulator V8</div><div id="stats"></div></div>
+<div id="top"><div id="brand">🧠 OT Clinic Simulator V9</div><div id="stats"></div></div>
 <div id="wrap">
 <canvas id="game"></canvas>
-<div id="objective"></div><div id="schedule"></div><div id="toast"></div><div id="hint"></div>
+<div id="schedule"></div><div id="toast"></div><div id="guideArrow">⬆</div><div id="hint"></div>
 <div id="controls">
 <div id="dpad"><button class="ctrl" id="up">▲</button><button class="ctrl" id="down">▼</button><button class="ctrl" id="left">◀</button><button class="ctrl" id="right">▶</button></div>
 <button id="interact">INTERACT</button>
@@ -52,19 +52,19 @@ textarea{width:100%;min-height:75px;border:1px solid #ccc;border-radius:11px;pad
 </div>
 <script>
 const cv=document.getElementById('game'),ctx=cv.getContext('2d');
-const statsEl=document.getElementById('stats'),objEl=document.getElementById('objective'),schedEl=document.getElementById('schedule');
-const toastEl=document.getElementById('toast'),hintEl=document.getElementById('hint');
+const statsEl=document.getElementById('stats'),schedEl=document.getElementById('schedule'),toastEl=document.getElementById('toast'),hintEl=document.getElementById('hint'),arrowEl=document.getElementById('guideArrow');
 
-const skinTones=['#f2c9aa','#dfa47e','#c48762','#9b6247','#74442f','#513020'];
-const hairColors=['#1e1715','#3a251e','#6a422c','#a56e42','#d7c3a9','#111'];
-const scrubColors=['#765fe0','#4d9eaf','#db789b','#5d9c76','#698ccc','#b576c7','#2f7f82'];
-const hairStyles=['bun','long','braids','curly','short','ponytail'];
-let avatar={skin:skinTones[1],hair:hairColors[0],scrub:scrubColors[0],pants:'#263649',style:'bun'};
+const skinTones=['#f3cfb3','#e4ad86','#c98a65','#a56a4c','#7d4b35','#573421'];
+const hairColors=['#171313','#2a1b18','#4a2c21','#6f472f','#a86f43','#d8c5a7','#101010'];
+const scrubColors=['#725ce0','#4b9daf','#d97798','#5c9b76','#6689c9','#b078c5','#2e7f81','#334a72'];
+const hairStyles=['soft bob','long straight','curly shoulder','high bun','low bun','ponytail','box braids','short fade','wavy'];
+const eyeStyles=['almond','round','soft'];
+let avatar={skin:skinTones[1],hair:hairColors[1],scrub:scrubColors[0],pants:'#263649',style:'soft bob',eyes:'almond'};
 
-let career={xp:+localStorage.v8xp||0,money:+localStorage.v8money||0,day:+localStorage.v8day||1};
-let G={started:false,stage:0,appt:0,eth:100,safe:100,clin:0,min:480,near:null,done:false,room:'hall'};
+let career={xp:+localStorage.v9xp||0,money:+localStorage.v9money||0,day:+localStorage.v9day||1};
+let G={started:false,stage:0,appt:0,eth:100,safe:100,clin:0,min:480,near:null,done:false,area:'hall'};
 let keys={up:0,down:0,left:0,right:0};
-const player={x:0,z:0,speedZ:5.2,speedX:5.0,moving:false};
+const player={x:0,z:0,speedZ:5.0,speedX:5.2,moving:false};
 
 const clients=[
  {name:'Maria',setting:'Neuro Gym',goal:'Dress independently',chart:'Right CVA with left hemiparesis. Fall risk. Possible left neglect.',
@@ -86,190 +86,232 @@ const clients=[
 
 const stations=[
  {id:'reception',z:420,x:0,label:'Reception'},
- {id:'chart',z:760,x:-210,label:'Chart Computer'},
- {id:'client',z:1080,x:190,label:'Waiting Client'},
- {id:'neuroDoor',z:1500,x:-320,label:'Neuro Gym Door',case:0,room:'neuro'},
- {id:'pedsDoor',z:1500,x:0,label:'Pediatric Gym Door',case:1,room:'peds'},
- {id:'handDoor',z:1500,x:320,label:'Hand Therapy Door',case:2,room:'hand'},
- {id:'soapDoor',z:2000,x:320,label:'Documentation Door',room:'soap'},
- {id:'exit',z:2500,x:0,label:'Exit'}
+ {id:'chart',z:900,x:-240,label:'Chart Computer'},
+ {id:'client',z:1260,x:230,label:'Waiting Client'},
+ {id:'neuroDoor',z:1800,x:-330,label:'Neuro Gym',case:0,area:'neuro'},
+ {id:'pedsDoor',z:2300,x:-330,label:'Pediatric Gym',case:1,area:'peds'},
+ {id:'handDoor',z:2800,x:330,label:'Hand Therapy',case:2,area:'hand'},
+ {id:'soapDoor',z:3350,x:330,label:'Documentation',area:'soap'},
+ {id:'exit',z:3900,x:0,label:'Exit'}
 ];
 
 function resize(){const r=cv.parentElement.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
 addEventListener('resize',resize);resize();
-function save(){localStorage.v8xp=career.xp;localStorage.v8money=career.money;localStorage.v8day=career.day}
+function save(){localStorage.v9xp=career.xp;localStorage.v9money=career.money;localStorage.v9day=career.day}
 function stat(){statsEl.innerHTML=`<span class="pill">Day ${career.day}</span><span class="pill">XP ${career.xp}</span><span class="pill">$${career.money}</span><span class="pill">Ethics ${G.eth}</span><span class="pill">Safety ${G.safe}</span>`}
 function time(){let h=Math.floor(G.min/60),m=G.min%60,ap=h>=12?'PM':'AM';return `${h%12||12}:${String(m).padStart(2,'0')} ${ap}`}
-function ui(){let c=clients[G.appt],t=G.done?'Walk to the clinic exit.':G.stage===0?'Go to Reception and clock in.':G.stage===1?`Review ${c.name}'s chart.`:G.stage===2?`Talk to ${c.name} in the waiting area.`:G.stage===3?`Enter ${c.setting}.`:G.stage===4?`Go to Documentation.`:'Return to Reception.';objEl.innerHTML='<b>Objective</b><br>'+t;schedEl.innerHTML=`<b>${time()}</b><br>${clients.map((c,i)=>(i<G.appt?'✅ ':i===G.appt&&!G.done?'➡️ ':'• ')+c.name).join('<br>')}`;stat()}
+function schedule(){schedEl.innerHTML=`<b>${time()}</b><br>${clients.map((c,i)=>(i<G.appt?'✅ ':i===G.appt&&!G.done?'➡️ ':'• ')+c.name).join('<br>')}`}
+function ui(){stat();schedule();updateGuide()}
 function toast(t){toastEl.textContent=t;toastEl.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>toastEl.style.display='none',2200)}
 function overlay(html){let d=document.createElement('div');d.className='overlay';d.id='overlay';d.innerHTML='<div class="panel">'+html+'</div>';document.body.appendChild(d)}
 function closeOverlay(){document.getElementById('overlay')?.remove()}
 
 function creator(){
- overlay(`<h1>Create Your OT</h1><p class="muted">Customize your character, then enter the rebuilt clinic.</p>
- <div class="creator"><div class="preview"><canvas id="previewCanvas" width="300" height="390"></canvas></div>
+ overlay(`<h1>Create Your OT</h1><p class="muted">V9 upgrades the face, eyes, hairstyles, and clinic layout.</p>
+ <div class="creator"><div class="preview"><canvas id="previewCanvas" width="310" height="410"></canvas></div>
  <div>
  <div class="group"><b>Skin tone</b><div class="swatches">${skinTones.map(c=>`<button class="swatch ${avatar.skin===c?'selected':''}" data-k="skin" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
  <div class="group"><b>Hair color</b><div class="swatches">${hairColors.map(c=>`<button class="swatch ${avatar.hair===c?'selected':''}" data-k="hair" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
  <div class="group"><b>Scrub color</b><div class="swatches">${scrubColors.map(c=>`<button class="swatch ${avatar.scrub===c?'selected':''}" data-k="scrub" data-v="${c}" style="background:${c}"></button>`).join('')}</div></div>
- <div class="group"><label><b>Hair style</b><select id="styleSelect">${hairStyles.map(s=>`<option ${avatar.style===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
+ <div class="group"><label><b>Hairstyle</b><select id="hairSelect">${hairStyles.map(s=>`<option ${avatar.style===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
+ <div class="group"><label><b>Eye shape</b><select id="eyeSelect">${eyeStyles.map(s=>`<option ${avatar.eyes===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
  </div></div>
- <div class="note info"><b>V8:</b> the hallway is now the main world. Rooms sit off the sides with their own interiors, so the clinic no longer stacks all furniture in front of you.</div>
+ <div class="note info"><b>V9 layout:</b> the clinic has longer hallways, spaced-out doors, separate rooms, and a floating guide arrow instead of a text objective box.</div>
  <button class="btn primary" id="startBtn">Enter Clinic</button>`);
  document.querySelectorAll('.swatch').forEach(b=>b.onclick=()=>{avatar[b.dataset.k]=b.dataset.v;closeOverlay();creator()});
- document.getElementById('styleSelect').onchange=e=>{avatar.style=e.target.value;drawPreview()};
- document.getElementById('startBtn').onclick=()=>{closeOverlay();G.started=true;ui();toast('Move forward to Reception.')};
+ document.getElementById('hairSelect').onchange=e=>{avatar.style=e.target.value;drawPreview()};
+ document.getElementById('eyeSelect').onchange=e=>{avatar.eyes=e.target.value;drawPreview()};
+ document.getElementById('startBtn').onclick=()=>{closeOverlay();G.started=true;ui();toast('Follow the arrow.')};
  setTimeout(drawPreview,20)
 }
-function drawPreview(){let p=document.getElementById('previewCanvas');if(!p)return;let c=p.getContext('2d');c.clearRect(0,0,p.width,p.height);drawPerson(c,150,260,avatar,2.4,true,false)}
+function drawPreview(){let p=document.getElementById('previewCanvas');if(!p)return;let c=p.getContext('2d');c.clearRect(0,0,p.width,p.height);drawPerson(c,155,275,avatar,2.35,true,false)}
 
 function drawPerson(c,x,y,a,s=1,front=false,moving=false){
  c.save();c.translate(x,y);let step=moving?Math.sin(Date.now()/95)*7:0;
- c.fillStyle='#0002';c.beginPath();c.ellipse(0,50*s,28*s,8*s,0,0,Math.PI*2);c.fill();
- c.fillStyle=a.pants||'#36414c';c.fillRect(-17*s,18*s+step,13*s,38*s);c.fillRect(4*s,18*s-step,13*s,38*s);
- c.fillStyle='#262b30';c.fillRect(-20*s,52*s+step,18*s,7*s);c.fillRect(2*s,52*s-step,18*s,7*s);
- c.fillStyle=a.scrub;c.beginPath();c.moveTo(-28*s,-20*s);c.quadraticCurveTo(0,-30*s,28*s,-20*s);c.lineTo(22*s,26*s);c.lineTo(-22*s,26*s);c.closePath();c.fill();
- c.fillStyle=a.skin;c.beginPath();c.roundRect(-36*s,-14*s,10*s,43*s,5*s);c.fill();c.beginPath();c.roundRect(26*s,-14*s,10*s,43*s,5*s);c.fill();
- c.fillRect(-7*s,-35*s,14*s,12*s);c.beginPath();c.ellipse(0,-58*s,22*s,27*s,0,0,Math.PI*2);c.fill();
+ c.fillStyle='#0002';c.beginPath();c.ellipse(0,51*s,29*s,8*s,0,0,Math.PI*2);c.fill();
+ c.fillStyle=a.pants||'#36414c';c.beginPath();c.roundRect(-17*s,17*s+step,13*s,40*s,5*s);c.fill();c.beginPath();c.roundRect(4*s,17*s-step,13*s,40*s,5*s);c.fill();
+ c.fillStyle='#252a30';c.fillRect(-20*s,53*s+step,18*s,7*s);c.fillRect(2*s,53*s-step,18*s,7*s);
+ c.fillStyle=a.scrub;c.beginPath();c.moveTo(-29*s,-20*s);c.quadraticCurveTo(0,-31*s,29*s,-20*s);c.lineTo(23*s,27*s);c.lineTo(-23*s,27*s);c.closePath();c.fill();
+ c.fillStyle=a.skin;c.beginPath();c.roundRect(-37*s,-14*s,10*s,44*s,5*s);c.fill();c.beginPath();c.roundRect(27*s,-14*s,10*s,44*s,5*s);c.fill();
+ c.fillRect(-7*s,-36*s,14*s,13*s);c.beginPath();c.ellipse(0,-59*s,22*s,28*s,0,0,Math.PI*2);c.fill();
+
  c.fillStyle=a.hair;
- if(a.style==='short'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill()}
- if(a.style==='bun'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill();c.beginPath();c.arc(0,-86*s,10*s,0,Math.PI*2);c.fill()}
- if(a.style==='long'){c.fillRect(-22*s,-73*s,44*s,42*s);c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-58*s,20*s,25*s,0,0,Math.PI*2);c.fill();c.fillStyle=a.hair;c.beginPath();c.arc(0,-70*s,22*s,Math.PI,Math.PI*2);c.fill()}
- if(a.style==='curly'){for(let xx=-18;xx<=18;xx+=9){c.beginPath();c.arc(xx*s,-72*s,8*s,0,Math.PI*2);c.fill()}}
- if(a.style==='ponytail'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill();c.beginPath();c.ellipse(25*s,-52*s,8*s,18*s,-.25,0,Math.PI*2);c.fill()}
- if(a.style==='braids'){c.beginPath();c.arc(0,-69*s,22*s,Math.PI,Math.PI*2);c.fill();c.fillRect(-22*s,-62*s,6*s,44*s);c.fillRect(16*s,-62*s,6*s,44*s)}
- if(front){c.fillStyle='#32262b';c.beginPath();c.arc(-7*s,-59*s,2*s,0,7);c.arc(7*s,-59*s,2*s,0,7);c.fill();c.strokeStyle='#945f58';c.lineWidth=1.4*s;c.beginPath();c.arc(0,-48*s,6*s,.2,Math.PI-.2);c.stroke()}
+ const st=a.style;
+ if(st==='short fade'){c.beginPath();c.arc(0,-70*s,22*s,Math.PI,Math.PI*2);c.fill();c.fillRect(-21*s,-70*s,42*s,6*s)}
+ if(st==='high bun'){c.beginPath();c.arc(0,-70*s,22*s,Math.PI,Math.PI*2);c.fill();c.beginPath();c.arc(0,-89*s,11*s,0,Math.PI*2);c.fill()}
+ if(st==='low bun'){c.beginPath();c.arc(0,-70*s,22*s,Math.PI,Math.PI*2);c.fill();c.beginPath();c.arc(18*s,-52*s,10*s,0,Math.PI*2);c.fill()}
+ if(st==='soft bob'){c.fillRect(-23*s,-74*s,46*s,42*s);c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-59*s,20*s,25*s,0,0,Math.PI*2);c.fill();c.fillStyle=a.hair;c.beginPath();c.arc(0,-72*s,22*s,Math.PI,Math.PI*2);c.fill()}
+ if(st==='long straight'){c.fillRect(-23*s,-74*s,46*s,62*s);c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-59*s,20*s,25*s,0,0,Math.PI*2);c.fill();c.fillStyle=a.hair;c.beginPath();c.arc(0,-72*s,22*s,Math.PI,Math.PI*2);c.fill()}
+ if(st==='curly shoulder'){for(let xx=-20;xx<=20;xx+=10){for(let yy=-78;yy<=-38;yy+=10){c.beginPath();c.arc(xx*s,yy*s,7*s,0,Math.PI*2);c.fill()}}c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-59*s,19*s,24*s,0,0,Math.PI*2);c.fill()}
+ if(st==='ponytail'){c.beginPath();c.arc(0,-70*s,22*s,Math.PI,Math.PI*2);c.fill();c.beginPath();c.ellipse(25*s,-52*s,9*s,22*s,-.25,0,Math.PI*2);c.fill()}
+ if(st==='box braids'){c.beginPath();c.arc(0,-70*s,22*s,Math.PI,Math.PI*2);c.fill();for(let xx of [-19,-11,-3,5,13])c.fillRect(xx*s,-63*s,4*s,52*s)}
+ if(st==='wavy'){c.fillRect(-22*s,-72*s,44*s,45*s);for(let yy=-68;yy<-30;yy+=12){c.beginPath();c.arc(-21*s,yy*s,6*s,0,Math.PI*2);c.arc(21*s,(yy+6)*s,6*s,0,Math.PI*2);c.fill()}c.fillStyle=a.skin;c.beginPath();c.ellipse(0,-59*s,19*s,24*s,0,0,Math.PI*2);c.fill()}
+
+ if(front){
+   c.fillStyle='#2f2629';
+   if(a.eyes==='round'){
+     c.beginPath();c.arc(-7*s,-59*s,2.7*s,0,7);c.arc(7*s,-59*s,2.7*s,0,7);c.fill()
+   }else if(a.eyes==='soft'){
+     c.strokeStyle='#2f2629';c.lineWidth=1.8*s;c.beginPath();c.arc(-7*s,-59*s,3*s,.1,Math.PI-.1);c.stroke();c.beginPath();c.arc(7*s,-59*s,3*s,.1,Math.PI-.1);c.stroke()
+   }else{
+     c.beginPath();c.ellipse(-7*s,-59*s,3*s,1.7*s,0,0,7);c.ellipse(7*s,-59*s,3*s,1.7*s,0,0,7);c.fill()
+   }
+   c.strokeStyle='#8b6359';c.lineWidth=1.1*s;c.beginPath();c.moveTo(0,-58*s);c.lineTo(-1*s,-52*s);c.stroke();
+   c.strokeStyle='#9a5964';c.lineWidth=1.4*s;c.beginPath();c.arc(0,-47*s,6*s,.22,Math.PI-.22);c.stroke()
+ }
  c.fillStyle='#fff';c.fillRect(9*s,-9*s,10*s,14*s);c.restore()
 }
 
 function project(z,x){
  const r=cv.getBoundingClientRect(),dz=z-player.z;if(dz<-120)return null;
- const horizon=r.height*.19,bottom=r.height*.86,t=Math.max(0,Math.min(1,dz/1500));
- const y=bottom-(bottom-horizon)*Math.pow(t,.72),corridorWidth=r.width*(.94-.70*t);
- const px=r.width/2+(x-player.x)*(corridorWidth/760),s=Math.max(.17,1.5*(1-t)+.16);
+ const horizon=r.height*.19,bottom=r.height*.86,t=Math.max(0,Math.min(1,dz/1700));
+ const y=bottom-(bottom-horizon)*Math.pow(t,.72),corridorWidth=r.width*(.95-.73*t);
+ const px=r.width/2+(x-player.x)*(corridorWidth/800),s=Math.max(.16,1.52*(1-t)+.15);
  return{x:px,y,s,dz,t,corridorWidth}
 }
 
 function drawHall(){
  const r=cv.getBoundingClientRect(),cx=r.width/2,h=r.height*.19,b=r.height;
- ctx.fillStyle='#eef4f5';ctx.fillRect(0,0,r.width,h+30);
- ctx.fillStyle='#d9d4cc';ctx.beginPath();ctx.moveTo(0,h);ctx.lineTo(r.width*.27,h);ctx.lineTo(cx,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
- ctx.fillStyle='#ded8cf';ctx.beginPath();ctx.moveTo(r.width,h);ctx.lineTo(r.width*.73,h);ctx.lineTo(cx,b);ctx.lineTo(r.width,b);ctx.closePath();ctx.fill();
- ctx.fillStyle='#c5bdb2';ctx.beginPath();ctx.moveTo(r.width*.27,h);ctx.lineTo(r.width*.73,h);ctx.lineTo(r.width,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
- ctx.strokeStyle='#9f968c';ctx.lineWidth=2;
+ ctx.fillStyle='#f0f5f6';ctx.fillRect(0,0,r.width,h+30);
+ ctx.fillStyle='#d7d2cb';ctx.beginPath();ctx.moveTo(0,h);ctx.lineTo(r.width*.28,h);ctx.lineTo(cx,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#ded9d1';ctx.beginPath();ctx.moveTo(r.width,h);ctx.lineTo(r.width*.72,h);ctx.lineTo(cx,b);ctx.lineTo(r.width,b);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#c7bfb5';ctx.beginPath();ctx.moveTo(r.width*.28,h);ctx.lineTo(r.width*.72,h);ctx.lineTo(r.width,b);ctx.lineTo(0,b);ctx.closePath();ctx.fill();
+ ctx.strokeStyle='#aaa198';ctx.lineWidth=1.6;
  for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(cx+i*r.width*.035,h);ctx.lineTo(cx+i*r.width*.16,b);ctx.stroke()}
- for(let i=1;i<15;i++){let yy=h+(b-h)*Math.pow(i/15,1.65);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(r.width,yy);ctx.stroke()}
- ctx.fillStyle='#fff';for(let i=1;i<8;i++){let yy=h*(i/8),ww=45+90*(i/8);ctx.fillRect(cx-ww/2,yy,ww,7)}
+ for(let i=1;i<16;i++){let yy=h+(b-h)*Math.pow(i/16,1.65);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(r.width,yy);ctx.stroke()}
+ ctx.fillStyle='#fff';for(let i=1;i<9;i++){let yy=h*(i/9),ww=44+96*(i/9);ctx.fillRect(cx-ww/2,yy,ww,7)}
 }
 
 function drawDoors(){
- const doors=[
-  {z:1470,x:-335,label:'NEURO GYM',id:'neuroDoor'},
-  {z:1470,x:0,label:'PEDIATRIC GYM',id:'pedsDoor'},
-  {z:1470,x:335,label:'HAND THERAPY',id:'handDoor'},
-  {z:1980,x:335,label:'DOCUMENTATION',id:'soapDoor'}
+ const ds=[
+  {z:1800,x:-340,label:'NEURO GYM'},
+  {z:2300,x:-340,label:'PEDIATRIC GYM'},
+  {z:2800,x:340,label:'HAND THERAPY'},
+  {z:3350,x:340,label:'DOCUMENTATION'}
  ];
- doors.forEach(d=>{
-  const p=project(d.z,d.x);if(!p||p.dz>1550)return;
+ ds.forEach(d=>{
+  const p=project(d.z,d.x);if(!p||p.dz>1750)return;
   ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
-  ctx.fillStyle='#7f7a72';ctx.fillRect(-70,-170,140,170);
-  ctx.fillStyle='#f1f1ee';ctx.fillRect(-56,-151,112,137);
-  ctx.fillStyle='#3d3c42';ctx.font='700 14px system-ui';ctx.textAlign='center';ctx.fillText(d.label,0,-185);
-  ctx.fillStyle='#8d8d89';ctx.beginPath();ctx.arc(42,-75,5,0,7);ctx.fill();
-  ctx.restore()
+  ctx.fillStyle='#7b756d';ctx.fillRect(-72,-172,144,172);
+  ctx.fillStyle='#f4f3f0';ctx.fillRect(-57,-153,114,138);
+  ctx.fillStyle='#303038';ctx.font='700 14px system-ui';ctx.textAlign='center';ctx.fillText(d.label,0,-187);
+  ctx.fillStyle='#8b8b86';ctx.beginPath();ctx.arc(42,-75,5,0,7);ctx.fill();ctx.restore()
  })
 }
 
 function drawLobby(){
- // Only show lobby furniture when close to lobby.
- if(player.z>850)return;
- const furn=[
-  {z:420,x:0,type:'desk'},
-  {z:760,x:-210,type:'computer'},
-  {z:1080,x:190,type:'chair'}
+ if(player.z>1300)return;
+ const things=[
+  {z:420,x:0,t:'desk'},
+  {z:900,x:-240,t:'computer'},
+  {z:1260,x:230,t:'chairs'}
  ];
- furn.forEach(o=>{
-  const p=project(o.z,o.x);if(!p||p.dz>1200)return;
-  ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
-  if(o.type==='desk'){ctx.fillStyle='#8d6548';ctx.fillRect(-112,-58,224,76);ctx.fillStyle='#c99d77';ctx.fillRect(-101,-48,202,18);ctx.fillStyle='#3c4349';ctx.fillRect(-30,-95,60,40);ctx.fillStyle='#c4dae8';ctx.fillRect(-23,-87,46,26)}
-  if(o.type==='computer'){ctx.fillStyle='#4e555f';ctx.fillRect(-55,-65,110,78);ctx.fillStyle='#bdd5e6';ctx.fillRect(-45,-55,90,54);ctx.fillStyle='#444';ctx.fillRect(-8,13,16,28);ctx.fillRect(-28,38,56,7)}
-  if(o.type==='chair'){ctx.fillStyle='#6d7d90';ctx.fillRect(-45,-45,90,60);ctx.fillRect(-50,15,12,55);ctx.fillRect(38,15,12,55);ctx.fillRect(-52,-105,104,65)}
-  ctx.restore()
+ things.forEach(o=>{
+   let p=project(o.z,o.x);if(!p||p.dz>1400)return;
+   ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.s,p.s);
+   if(o.t==='desk'){
+     ctx.fillStyle='#7f5c43';ctx.beginPath();ctx.roundRect(-120,-58,240,78,8);ctx.fill();
+     ctx.fillStyle='#cfa37d';ctx.fillRect(-107,-49,214,18);
+     ctx.fillStyle='#3d444a';ctx.fillRect(-34,-96,68,40);ctx.fillStyle='#c6dbe8';ctx.fillRect(-26,-88,52,26)
+   }
+   if(o.t==='computer'){
+     ctx.fillStyle='#4b535d';ctx.fillRect(-56,-66,112,80);ctx.fillStyle='#bad4e5';ctx.fillRect(-46,-56,92,55);
+     ctx.fillStyle='#3e4247';ctx.fillRect(-8,14,16,30);ctx.fillRect(-28,41,56,7)
+   }
+   if(o.t==='chairs'){
+     ctx.fillStyle='#6f7e90';for(let q=-1;q<=1;q++){ctx.fillRect(q*70-25,-55,50,65);ctx.fillRect(q*70-29,-110,58,55)}
+   }
+   ctx.restore()
  })
 }
 
-function drawRoomInterior(){
- if(G.room==='hall')return;
- const r=cv.getBoundingClientRect();
- // room walls
- ctx.fillStyle=G.room==='neuro'?'#edf8f3':G.room==='peds'?'#fff0f6':G.room==='hand'?'#eef3ff':'#edf5fb';
- ctx.fillRect(0,0,r.width,r.height);
- ctx.fillStyle='#c8c2ba';ctx.fillRect(0,r.height*.62,r.width,r.height*.38);
- ctx.strokeStyle='#b2aaa1';for(let y=r.height*.62;y<r.height;y+=42){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(r.width,y);ctx.stroke()}
- if(G.room==='neuro'){
-   ctx.fillStyle='#78a6ab';ctx.fillRect(r.width*.18,r.height*.32,r.width*.52,90);
-   ctx.fillStyle='#cce4e6';ctx.fillRect(r.width*.21,r.height*.35,r.width*.46,55);
-   ctx.fillStyle='#e48755';for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(r.width*.18+i*45,r.height*.58);ctx.lineTo(r.width*.20+i*45,r.height*.50);ctx.lineTo(r.width*.22+i*45,r.height*.58);ctx.fill()}
+function drawRoom(){
+ const r=cv.getBoundingClientRect(),room=G.area;
+ const bg=room==='neuro'?'#edf7f3':room==='peds'?'#fff1f6':room==='hand'?'#edf2fb':'#edf5fb';
+ ctx.fillStyle=bg;ctx.fillRect(0,0,r.width,r.height);
+ ctx.fillStyle='#d4cec5';ctx.fillRect(0,r.height*.60,r.width,r.height*.40);
+ ctx.strokeStyle='#b9b0a7';
+ for(let y=r.height*.60;y<r.height;y+=45){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(r.width,y);ctx.stroke()}
+ ctx.fillStyle='#f8f8f6';ctx.fillRect(0,0,r.width,34);
+
+ if(room==='neuro'){
+  ctx.fillStyle='#75a2a8';ctx.beginPath();ctx.roundRect(r.width*.14,r.height*.31,r.width*.54,100,15);ctx.fill();
+  ctx.fillStyle='#c8e1e3';ctx.beginPath();ctx.roundRect(r.width*.18,r.height*.34,r.width*.46,62,10);ctx.fill();
+  ctx.fillStyle='#e48755';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(r.width*.15+i*48,r.height*.61);ctx.lineTo(r.width*.17+i*48,r.height*.50);ctx.lineTo(r.width*.19+i*48,r.height*.61);ctx.fill()}
+  ctx.fillStyle='#7b8b92';ctx.fillRect(r.width*.76,r.height*.30,65,150)
  }
- if(G.room==='peds'){
-   ctx.strokeStyle='#626a72';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(r.width*.40,0);ctx.lineTo(r.width*.45,r.height*.34);ctx.moveTo(r.width*.60,0);ctx.lineTo(r.width*.55,r.height*.34);ctx.stroke();
-   ctx.fillStyle='#efc75a';ctx.beginPath();ctx.ellipse(r.width*.50,r.height*.40,80,34,0,0,7);ctx.fill();
-   ctx.fillStyle='#75a8bf';ctx.fillRect(r.width*.23,r.height*.58,r.width*.54,34)
+ if(room==='peds'){
+  ctx.strokeStyle='#5b646c';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(r.width*.38,0);ctx.lineTo(r.width*.44,r.height*.32);ctx.moveTo(r.width*.62,0);ctx.lineTo(r.width*.56,r.height*.32);ctx.stroke();
+  ctx.fillStyle='#f0c55d';ctx.beginPath();ctx.ellipse(r.width*.50,r.height*.39,88,38,0,0,7);ctx.fill();
+  ctx.fillStyle='#77a8bf';ctx.beginPath();ctx.roundRect(r.width*.18,r.height*.57,r.width*.64,40,12);ctx.fill();
+  ctx.fillStyle='#dc7c9c';ctx.beginPath();ctx.arc(r.width*.25,r.height*.45,25,0,7);ctx.fill();ctx.fillStyle='#6eb083';ctx.beginPath();ctx.arc(r.width*.75,r.height*.45,25,0,7);ctx.fill()
  }
- if(G.room==='hand'){
-   ctx.fillStyle='#bed0e7';ctx.fillRect(r.width*.22,r.height*.34,r.width*.56,95);
-   ctx.fillStyle='#6c809c';ctx.fillRect(r.width*.28,r.height*.39,r.width*.44,50);
-   ctx.fillStyle='#e7c85f';ctx.beginPath();ctx.arc(r.width*.42,r.height*.55,18,0,7);ctx.fill();ctx.fillStyle='#dd829f';ctx.beginPath();ctx.arc(r.width*.58,r.height*.55,18,0,7);ctx.fill()
+ if(room==='hand'){
+  ctx.fillStyle='#bed0e7';ctx.beginPath();ctx.roundRect(r.width*.18,r.height*.33,r.width*.64,105,14);ctx.fill();
+  ctx.fillStyle='#667b98';ctx.beginPath();ctx.roundRect(r.width*.25,r.height*.39,r.width*.50,54,10);ctx.fill();
+  ctx.fillStyle='#e8c862';ctx.beginPath();ctx.arc(r.width*.39,r.height*.57,20,0,7);ctx.fill();ctx.fillStyle='#dd819f';ctx.beginPath();ctx.arc(r.width*.54,r.height*.57,20,0,7);ctx.fill();ctx.fillStyle='#74a88b';ctx.beginPath();ctx.arc(r.width*.67,r.height*.57,20,0,7);ctx.fill()
  }
- if(G.room==='soap'){
-   ctx.fillStyle='#4e555f';ctx.fillRect(r.width*.36,r.height*.28,r.width*.28,130);
-   ctx.fillStyle='#c4dae9';ctx.fillRect(r.width*.39,r.height*.32,r.width*.22,82);
-   ctx.fillStyle='#8a6a4d';ctx.fillRect(r.width*.26,r.height*.55,r.width*.48,50)
+ if(room==='soap'){
+  ctx.fillStyle='#8c684c';ctx.beginPath();ctx.roundRect(r.width*.18,r.height*.53,r.width*.64,58,8);ctx.fill();
+  ctx.fillStyle='#4e555f';ctx.fillRect(r.width*.38,r.height*.28,r.width*.24,135);ctx.fillStyle='#c4dae9';ctx.fillRect(r.width*.41,r.height*.32,r.width*.18,82);
+  ctx.fillStyle='#777';ctx.fillRect(r.width*.475,r.height*.47,16,45)
  }
- // door back to hall
- ctx.fillStyle='#6e655e';ctx.fillRect(18,18,110,50);ctx.fillStyle='#fff';ctx.font='700 14px system-ui';ctx.fillText('BACK TO HALL',30,50)
+ ctx.fillStyle='#6c645d';ctx.fillRect(16,14,120,50);ctx.fillStyle='#fff';ctx.font='700 13px system-ui';ctx.fillText('BACK TO HALL',28,45)
 }
 
 function drawCurrentClient(){
- if(G.done||G.stage>2||G.room!=='hall')return;
- const s=stations.find(x=>x.id==='client'),p=project(s.z,s.x);if(!p||p.dz>1400)return;
- const look={skin:G.appt===0?'#d1a07d':G.appt===1?'#b77954':'#9f684a',hair:G.appt===0?'#b9b2aa':'#241a17',scrub:G.appt===0?'#a989ad':G.appt===1?'#4e9fb4':'#6f8ed0',pants:'#49535d',style:G.appt===0?'short':G.appt===1?'curly':'short'};
- drawPerson(ctx,p.x,p.y,look,p.s*.8,true,false)
+ if(G.done||G.stage>2||G.area!=='hall')return;
+ const s=stations.find(x=>x.id==='client'),p=project(s.z,s.x);if(!p||p.dz>1600)return;
+ const look={skin:G.appt===0?'#d1a07d':G.appt===1?'#b77954':'#9f684a',hair:G.appt===0?'#b9b2aa':'#241a17',scrub:G.appt===0?'#a989ad':G.appt===1?'#4e9fb4':'#6f8ed0',pants:'#49535d',style:G.appt===0?'soft bob':G.appt===1?'curly shoulder':'short fade',eyes:'soft'};
+ drawPerson(ctx,p.x,p.y,look,p.s*.78,true,false)
 }
 
 function drawScene(){
  const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);
- if(G.room==='hall'){drawHall();drawDoors();drawLobby();drawCurrentClient()}
- else drawRoomInterior();
+ if(G.area==='hall'){drawHall();drawDoors();drawLobby();drawCurrentClient()} else drawRoom();
  drawPerson(ctx,r.width/2,r.height*.84,avatar,1.0,false,G.started&&player.moving);
  requestAnimationFrame(drawScene)
 }
 drawScene();
 
+function targetStation(){
+ if(G.done)return stations.find(s=>s.id==='exit');
+ if(G.stage===0)return stations.find(s=>s.id==='reception');
+ if(G.stage===1)return stations.find(s=>s.id==='chart');
+ if(G.stage===2)return stations.find(s=>s.id==='client');
+ if(G.stage===3)return stations.find(s=>s.case===G.appt);
+ if(G.stage===4)return stations.find(s=>s.id==='soapDoor');
+ return stations.find(s=>s.id==='reception')
+}
+function updateGuide(){
+ if(G.area!=='hall'){arrowEl.textContent='↩';arrowEl.style.transform='translateX(-50%)';return}
+ const t=targetStation();if(!t){arrowEl.style.display='none';return}
+ arrowEl.style.display='block';
+ const dz=t.z-player.z,dx=t.x-player.x;
+ let deg=0;
+ if(Math.abs(dx)>130&&Math.abs(dx)>Math.abs(dz)*.35)deg=dx>0?90:-90;
+ else deg=dz>=0?0:180;
+ arrowEl.textContent='⬆';
+ arrowEl.style.transform=`translateX(-50%) rotate(${deg}deg)`
+}
 function findNear(){
- if(G.room!=='hall'){
-  G.near={id:'back',label:'Back to Hall'};
-  hintEl.style.display='block';hintEl.textContent='Interact: Back to Hall';return
- }
+ if(G.area!=='hall'){G.near={id:'back',label:'Back to Hall'};hintEl.style.display='block';hintEl.textContent='Interact: Back to Hall';return}
  let best=null,bd=999;
  stations.forEach(s=>{
   if(['neuroDoor','pedsDoor','handDoor'].includes(s.id)&&s.case!==G.appt)return;
   let d=Math.hypot((s.z-player.z)/1.2,(s.x-player.x));
   if(d<bd){bd=d;best=s}
  });
- if(best&&bd<165){G.near=best;hintEl.style.display='block';hintEl.textContent='Interact: '+best.label}
- else{G.near=null;hintEl.style.display='none'}
+ if(best&&bd<170){G.near=best;hintEl.style.display='block';hintEl.textContent='Interact: '+best.label}else{G.near=null;hintEl.style.display='none'}
 }
 function loop(){
  if(G.started&&!document.getElementById('overlay')){
   player.moving=!!(keys.up||keys.down||keys.left||keys.right);
-  if(G.room==='hall'){
-   if(keys.up)player.z+=player.speedZ;
-   if(keys.down)player.z=Math.max(0,player.z-player.speedZ);
-   if(keys.left)player.x=Math.max(-340,player.x-player.speedX);
-   if(keys.right)player.x=Math.min(340,player.x+player.speedX)
+  if(G.area==='hall'){
+   if(keys.up)player.z+=player.speedZ;if(keys.down)player.z=Math.max(0,player.z-player.speedZ);
+   if(keys.left)player.x=Math.max(-350,player.x-player.speedX);if(keys.right)player.x=Math.min(350,player.x+player.speedX)
   }
-  findNear()
+  findNear();updateGuide()
  }
  setTimeout(loop,16)
 }
@@ -277,56 +319,48 @@ loop();
 
 function bind(id,key){let e=document.getElementById(id);e.addEventListener('pointerdown',ev=>{ev.preventDefault();keys[key]=1});['pointerup','pointercancel','pointerleave'].forEach(t=>e.addEventListener(t,()=>keys[key]=0))}
 bind('up','up');bind('down','down');bind('left','left');bind('right','right');
-document.getElementById('interact').onclick=()=>{if(!G.near)return toast('Move closer to the clinic station.');interact(G.near.id)};
+document.getElementById('interact').onclick=()=>{if(!G.near)return toast('Follow the arrow and move closer.');interact(G.near.id)};
 
 function interact(id){
- if(id==='back'){G.room='hall';player.z=1450;player.x=0;return}
+ if(id==='back'){G.area='hall';return}
  if(id==='reception')return reception();
  if(id==='chart')return chart();
  if(id==='client')return clientTalk();
- if(['neuroDoor','pedsDoor','handDoor'].includes(id))return enterTreatmentRoom(id);
- if(id==='soapDoor')return enterSoapRoom();
+ if(['neuroDoor','pedsDoor','handDoor'].includes(id))return enterTreatment(id);
+ if(id==='soapDoor')return enterSoap();
  if(id==='exit')return exitDay()
 }
-function enterTreatmentRoom(id){
- if(G.stage!==3)return toast('Complete the client interview first.');
- const map={neuroDoor:'neuro',pedsDoor:'peds',handDoor:'hand'};
- G.room=map[id];showTreatmentSoon()
-}
-function showTreatmentSoon(){setTimeout(()=>{let c=clients[G.appt];showChoices(c.setting,c.treat,'treat')},200)}
-function enterSoapRoom(){if(G.stage!==4)return toast('Complete treatment first.');G.room='soap';setTimeout(soap,200)}
 function reception(){
  if(G.stage===0){G.stage=1;G.min+=5;ui();overlay(`<h2>Reception</h2><p>You clock in. Your first client is <b>${clients[G.appt].name}</b>.</p><button class="btn primary" id="ok">Continue</button>`);document.getElementById('ok').onclick=closeOverlay}
- else if(G.stage===5){if(G.appt<2){G.appt++;G.stage=1;G.min+=10;player.z=380;player.x=0;ui();overlay(`<h2>Next Appointment</h2><p>${clients[G.appt].name} is ready.</p><button class="btn primary" id="ok">Continue</button>`);document.getElementById('ok').onclick=closeOverlay}else{G.done=true;ui();toast('All clients complete. Head to EXIT.')}}
+ else if(G.stage===5){if(G.appt<2){G.appt++;G.stage=1;G.min+=10;player.z=380;player.x=0;ui();overlay(`<h2>Next Appointment</h2><p>${clients[G.appt].name} is ready.</p><button class="btn primary" id="ok">Continue</button>`);document.getElementById('ok').onclick=closeOverlay}else{G.done=true;ui();toast('All clients complete. Follow the arrow to EXIT.')}}
 }
-function chart(){if(G.stage!==1)return toast('Not time for chart review yet.');let c=clients[G.appt];G.min+=8;ui();overlay(`<h2>${c.name} — Chart</h2><p>${c.chart}</p><p><b>Goal:</b> ${c.goal}</p><button class="btn primary" id="doneChart">Finish Chart Review</button>`);document.getElementById('doneChart').onclick=()=>{G.stage=2;G.clin+=5;closeOverlay();ui();toast('Go speak with the client.')}}
+function chart(){if(G.stage!==1)return toast('Not time for chart review yet.');let c=clients[G.appt];G.min+=8;ui();overlay(`<h2>${c.name} — Chart</h2><p>${c.chart}</p><p><b>Goal:</b> ${c.goal}</p><button class="btn primary" id="doneChart">Finish Chart Review</button>`);document.getElementById('doneChart').onclick=()=>{G.stage=2;G.clin+=5;closeOverlay();ui()}}
 function clientTalk(){if(G.stage!==2)return toast('Review the chart first.');let c=clients[G.appt];showChoices(c.name,c.talk,'talk')}
-function showChoices(title,data,type){
- overlay(`<h2>${title}</h2><p>${data[0]}</p>${data.slice(1).map((a,i)=>`<button class="btn choice" data-i="${i+1}">${a[0]}</button>`).join('')}`);
- document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>answer(type,+b.dataset.i))
-}
+function enterTreatment(id){if(G.stage!==3)return toast('Complete the client interview first.');G.area=id==='neuroDoor'?'neuro':id==='pedsDoor'?'peds':'hand';setTimeout(()=>showChoices(clients[G.appt].setting,clients[G.appt].treat,'treat'),180)}
+function enterSoap(){if(G.stage!==4)return toast('Complete treatment first.');G.area='soap';setTimeout(soap,180)}
+function showChoices(title,data,type){overlay(`<h2>${title}</h2><p>${data[0]}</p>${data.slice(1).map((a,i)=>`<button class="btn choice" data-i="${i+1}">${a[0]}</button>`).join('')}`);document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>answer(type,+b.dataset.i))}
 function answer(type,i){
  let c=clients[G.appt],a=c[type][i];G.clin+=a[1]*5;
- if(type==='talk'){closeOverlay();G.stage=3;ui();toast('Enter '+c.setting+'.');player.z=1300;return}
+ if(type==='talk'){closeOverlay();G.stage=3;player.z=1450;ui();return}
  if(type==='treat'){closeOverlay();ethics();return}
  if(type==='eth'){if(a[1]<3)G.eth-=20;closeOverlay();safety();ui();return}
- if(type==='safe'){if(a[1]<3)G.safe-=25;G.stage=4;closeOverlay();G.room='hall';ui();player.z=1820;player.x=250;toast('Go to Documentation.');return}
+ if(type==='safe'){if(a[1]<3)G.safe-=25;G.stage=4;closeOverlay();G.area='hall';player.z=3000;player.x=200;ui();return}
 }
-function ethics(){let c=clients[G.appt];showChoices('Ethics Scenario',c.eth,'eth')}
-function safety(){let c=clients[G.appt];showChoices('Safety Event',c.safe,'safe')}
+function ethics(){showChoices('Ethics Scenario',clients[G.appt].eth,'eth')}
+function safety(){showChoices('Safety Event',clients[G.appt].safe,'safe')}
 function soap(){
  let c=clients[G.appt];overlay(`<h2>SOAP Note — ${c.name}</h2><textarea id="S" placeholder="S — Subjective"></textarea><textarea id="O" placeholder="O — Objective"></textarea><textarea id="A" placeholder="A — Assessment"></textarea><textarea id="P" placeholder="P — Plan"></textarea><button class="btn primary" id="submitNote">Submit Note</button>`);
- document.getElementById('submitNote').onclick=()=>{let vals=['S','O','A','P'].map(id=>document.getElementById(id).value.trim());if(vals.some(v=>v.length<8))return alert('Add a little more detail to each section.');G.stage=5;career.xp+=30;career.money+=20;save();closeOverlay();G.room='hall';ui();player.z=360;player.x=0;toast('Appointment complete. Return to Reception.')}
+ document.getElementById('submitNote').onclick=()=>{let vals=['S','O','A','P'].map(id=>document.getElementById(id).value.trim());if(vals.some(v=>v.length<8))return alert('Add a little more detail to each section.');G.stage=5;career.xp+=30;career.money+=20;save();closeOverlay();G.area='hall';player.z=360;player.x=0;ui();toast('Appointment complete. Follow the arrow back to Reception.')}
 }
 function exitDay(){
  if(!G.done)return toast('Finish all appointments first.');
  let final=Math.max(0,Math.min(100,Math.round(65+G.clin/12+(G.eth-100)/4+(G.safe-100)/4)));
  career.xp+=Math.round(final*.6);career.money+=Math.round(final*.25);career.day++;save();
- overlay(`<h1>Day Complete 🎉</h1><h2>${final}%</h2><p>V8 now separates hallway travel from individual treatment rooms.</p><button class="btn primary" id="again">Start Next Workday</button>`);
+ overlay(`<h1>Day Complete 🎉</h1><h2>${final}%</h2><p>V9 now uses a cleaner arrow-guided clinic with spaced-out rooms and upgraded character features.</p><button class="btn primary" id="again">Start Next Workday</button>`);
  document.getElementById('again').onclick=()=>location.reload()
 }
 
-stat();ui();creator();
+stat();schedule();updateGuide();creator();
 </script>
 </body>
 </html>
